@@ -95,19 +95,19 @@ commit;
 
 NB. =========================================================
 testdb=: 3 : 0
-NB. setzlocale_jddmysql_ ''
+NB. setzlocale_jddsqlite_ ''
 db=. '' conew 'jddsqlite'
 
-ddconfig__db 'errret';0;'dayno';1;'unicode';1
+ddconfig__db 'errret';0;'dayno';0;'unicode';1
 
 smoutput '>> dddriver'
-smoutput dddriver__db ''
+smoutput dddriver__db''
 
 smoutput '>> dddrv'
-smoutput dddrv__db ''
+smoutput dddrv__db''
 
 smoutput '>> ddsrc'
-smoutput ddsrc__db ''
+smoutput ddsrc__db''
 
 smoutput '>> delete old database'
 f=. jpath '~temp/jdata.sqlite'
@@ -240,6 +240,42 @@ if. _1~: ch=. ddcon__db 'database=',f,';nocreate=0' do.
     smoutput dderr__db''
   end.
 
+  smoutput '>> bulk insert with ddparm'
+  ch ddsql__db~ 'delete from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203'
+  smoutput '>> begin insert ', (":len), ' rows'
+  sql=. 'insert into tdata(NAME, SEX, DEPT, DOB, DOH, SALARY) values (?,?,?,?,?,?)'
+  if. _1~: rc=. ch ddparm__db~ sql;((3#SQL_VARCHAR),(2#integerdate{::SQL_TYPE_DATE,SQL_INTEGER),SQL_INTEGER);data do.
+    smoutput '>> finish insert ', (":len), ' rows'
+    smoutput '>> ddcnt'
+    smoutput ddcnt__db ch
+    if. _1~: sh=. ch ddsel__db~ 'select count(*) from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203' do.
+      smoutput ddfet__db sh,_1
+      ddend__db sh
+    else.
+      smoutput dderr__db''
+    end.
+  else.
+    smoutput dderr__db''
+  end.
+
+  smoutput '>> bulk insert with ddsparm'
+  ch ddsql__db~ 'delete from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203'
+  smoutput '>> begin insert ', (":len), ' rows'
+  sql=. 'insert into tdata(NAME, SEX, DEPT, DOB, DOH, SALARY) values (?,?,?,?,?,?)'
+  if. _1~: rc=. ch ddsparm__db~ sql;data do.
+    smoutput '>> finish insert ', (":len), ' rows'
+    smoutput '>> ddcnt'
+    smoutput ddcnt__db ch
+    if. _1~: sh=. ch ddsel__db~ 'select count(*) from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203' do.
+      smoutput ddfet__db sh,_1
+      ddend__db sh
+    else.
+      smoutput dderr__db''
+    end.
+  else.
+    smoutput dderr__db''
+  end.
+
   smoutput '>> ddsparm'
   if. 0= rc=. ch ddsparm__db~ 'update tdata set PHOTO=? where NAME=?';(>'photo1';'photo2';'photo3');< (>'Abbott K';'Nobody';'Denny D') do.
     smoutput '>> ddcnt'
@@ -260,6 +296,28 @@ if. _1~: ch=. ddcon__db 'database=',f,';nocreate=0' do.
     if. _1~: sh=. ch ddsel__db~ 'select * from tdata where photo is not null' do.
       smoutput ddfet__db sh,_1
       ddend__db sh
+    else.
+      smoutput dderr__db''
+    end.
+  else.
+    smoutput dderr__db''
+  end.
+
+  smoutput '>> ddsparm long binary'
+  photo1=. a.{~ ?1e5#256
+  photo2=. a.{~ ?5e6#256
+  if. 0= rc=. ch ddsparm__db~ 'update tdata set PHOTO=? where NAME=?';(photo1;photo2);< (>'Abbott K';'Denny D') do.
+    smoutput '>> ddcnt'
+    smoutput ddcnt__db ch
+    if. _1~: sh=. ch ddsel__db~ 'select NAME,PHOTO from tdata where NAME in (''Abbott K'',''Denny D'') order by NAME' do.
+      photo=. 1{"1 ddfet__db sh,_1
+      ddend__db sh
+      smoutput 'photo # ',": #&> photo
+      if. photo -: photo1;photo2 do.
+        smoutput 'long binary test ok'
+      else.
+        smoutput 'long binary test failed'
+      end.
     else.
       smoutput dderr__db''
     end.

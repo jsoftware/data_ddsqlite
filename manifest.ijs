@@ -11,7 +11,7 @@ For windows, download from http://www.sqlite.org/download.html
 See wiki page http://www.jsoftware.com/jwiki/JDD for help.
 )
 
-VERSION=: '1.0.0'
+VERSION=: '1.0.1'
 
 RELEASE=: 'j602 j701'
 
