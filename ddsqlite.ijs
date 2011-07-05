@@ -268,6 +268,8 @@ SQL_WVARCHAR_z_=: SQL_WVARCHAR=: _9
 SQL_WLONGVARCHAR_z_=: SQL_WLONGVARCHAR=: _10
 SQL_UNIQUEID_z_=: SQL_UNIQUEID=: _11
 
+SQL_NULL_DATA_z_=: SQL_NULL_DATA=: _1
+
 native_type_table=: ". ;._2 [ 0 : 0
 SQL_TINYINT
 SQL_SMALLINT
@@ -1162,10 +1164,18 @@ for_i. i.ncol do.
       if. 1 4 8 -.@e.~ 3!:0 da=. (i+of){::x do.
         ec=. SQL_ERROR break.
       end.
-      da=. isotimestamp 1 tsrep <.86400000* ,da
+      da=. isotimestamp 1 tsrep <.86400000* da0=. ,da
       if. SQL_TYPE_TIMESTAMP= t do. (bname)=: 23{."1 da
       elseif. SQL_TYPE_DATE= t do. (bname)=: 10{."1 da
       elseif. SQL_TYPE_TIME= t do. (bname)=: 11}."1 da
+      end.
+      lns=. (ls=. {:@$ da) i}lns
+      nr=. #da
+      (bnamel)=: nr$ls
+      if. t e. SQL_TYPE_TIMESTAMP,SQL_TYPE_DATE do.
+        if. 1 e. nul=. 0= da0 do.
+          (bnamel)=: SQL_NULL_DATA (I. nul)} bnamel~
+        end.
       end.
     else.
       if. 2 131072 -.@e.~ 3!:0 da=. (i+of){::x do.
@@ -1176,9 +1186,15 @@ for_i. i.ncol do.
       elseif. SQL_TYPE_DATE= t do. (bname)=: 10{."1 da
       elseif. SQL_TYPE_TIME= t do. (bname)=: da
       end.
+      lns=. (ls=. {:@$ da) i}lns
+      nr=. #da
+      (bnamel)=: nr$ls
+      if. t e. SQL_TYPE_TIMESTAMP,SQL_TYPE_DATE do.
+        if. 1 e. nul=. (+./("1) '1800-01-01'&E.("1) da) +. (+./("1) 'NULL'&E.("1) da) do.
+          (bnamel)=: SQL_NULL_DATA (I. nul)} bnamel~
+        end.
+      end.
     end.
-    lns=. (ls=. {:@$ da) i}lns
-    (bnamel)=: nr$ls
   case. do.
     freestmt sh [ r=. errret ISI51
     if. loctran do. SQL_ROLLBACK transact y end.
@@ -1197,26 +1213,31 @@ ec=. SQLITE_OK
 while. k<rows do.
   for_i. i.ncol do.
     bname=. 'BIND',(":sh),'_',":i
-    select. t=. i{ty
-    case. SQL_INTEGER do.
-      ec=. sqlite3_bind_int`sqlite3_bind_int64@.IF64 sh;(>:i);k{bname~
-    case. SQL_DOUBLE do.
-      ec=. sqlite3_bind_double sh;(>:i);k{bname~
-    case. SQL_CHAR;SQL_WCHAR;SQL_VARCHAR;SQL_WVARCHAR do.
-      ec=. sqlite3_bind_text sh;(>:i);(utf8 ,>k{bname~);_1;SQLITE_TRANSIENT
-    case. SQL_LONGVARCHAR;SQL_WLONGVARCHAR do.
-      blob=. ,>k{bname~
-      ec=. sqlite3_bind_text sh;(>:i);blob;(#blob);SQLITE_TRANSIENT
-    case. SQL_LONGVARBINARY do.
-      if. #blob=. ,>k{bname~ do.
-        ec=. sqlite3_bind_blob sh;(>:i);blob;(#blob);SQLITE_TRANSIENT
-      else.
-        ec=. sqlite3_bind_zeroblob sh;(>:i);_1
+    bnamel=. 'BINDLN',(":sh),'_',":i
+    if. SQL_NULL_DATA = k{bnamel~ do.
+      ec=. sqlite3_bind_null sh;(>:i)
+    else.
+      select. t=. i{ty
+      case. SQL_INTEGER do.
+        ec=. sqlite3_bind_int`sqlite3_bind_int64@.IF64 sh;(>:i);k{bname~
+      case. SQL_DOUBLE do.
+        ec=. sqlite3_bind_double sh;(>:i);k{bname~
+      case. SQL_CHAR;SQL_WCHAR;SQL_VARCHAR;SQL_WVARCHAR do.
+        ec=. sqlite3_bind_text sh;(>:i);(utf8 ,>k{bname~);_1;SQLITE_TRANSIENT
+      case. SQL_LONGVARCHAR;SQL_WLONGVARCHAR do.
+        blob=. ,>k{bname~
+        ec=. sqlite3_bind_text sh;(>:i);blob;(#blob);SQLITE_TRANSIENT
+      case. SQL_LONGVARBINARY do.
+        if. #blob=. ,>k{bname~ do.
+          ec=. sqlite3_bind_blob sh;(>:i);blob;(#blob);SQLITE_TRANSIENT
+        else.
+          ec=. sqlite3_bind_zeroblob sh;(>:i);_1
+        end.
+      case. SQL_TYPE_DATE;SQL_TYPE_TIME;SQL_TYPE_TIMESTAMP do.
+        ec=. sqlite3_bind_text sh;(>:i);(utf8 ,>k{bname~);_1;SQLITE_TRANSIENT
+      case. do.
+        assert. 0
       end.
-    case. SQL_TYPE_DATE;SQL_TYPE_TIME;SQL_TYPE_TIMESTAMP do.
-      ec=. sqlite3_bind_text sh;(>:i);(utf8 ,>k{bname~);_1;SQLITE_TRANSIENT
-    case. do.
-      assert. 0
     end.
     if. SQLITE_OK~:ec do. break. end.
   end.
