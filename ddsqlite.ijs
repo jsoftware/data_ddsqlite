@@ -1354,7 +1354,7 @@ while.do.
     errret sh_to_ch sh return.
   end.
   if. (SQLITE_ROW) -.@e.~ rc do.
-    ddend^:(-.UseErrRet) sh
+    ddend sh
     break.
   end.
 
