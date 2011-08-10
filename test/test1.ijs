@@ -98,7 +98,7 @@ testdb=: 3 : 0
 NB. setzlocale_jddsqlite_ ''
 db=. '' conew 'jddsqlite'
 
-ddconfig__db 'errret';0;'dayno';0;'unicode';1
+ddconfig__db 'errret';1;'dayno';0;'unicode';1
 
 smoutput '>> dddriver'
 smoutput dddriver__db''
@@ -117,7 +117,8 @@ smoutput '>> create empty database'
 '' 1!:2 <f
 
 smoutput '>> open database'
-if. _1~: ch=. ddcon__db 'database=',f,';nocreate=0' do.
+if. sqlresok__db rc=. ddcon__db 'database=',f,';nocreate=0' do.
+  ch=. sqlres__db rc
   smoutput '>> create metadata and fill sample data'
   smoutput ch exec__db~ integerdate{::tdata_ddl;tdata_ddl2
   smoutput ch exec__db~ integerdate{::tdata_data;tdata_data2
@@ -128,7 +129,8 @@ if. _1~: ch=. ddcon__db 'database=',f,';nocreate=0' do.
   smoutput ddtblx__db ch
 
   smoutput '>> ddtbl'
-  if. _1~: sh=. ddtbl__db ch do.
+  if. sqlresok__db rc=. ddtbl__db ch do.
+    sh=. sqlres__db rc
     smoutput '>> ddcnm'
     smoutput ddcnm__db sh
     smoutput '>> ddfet'
@@ -137,7 +139,8 @@ if. _1~: ch=. ddcon__db 'database=',f,';nocreate=0' do.
   smoutput '>> ddcol'
   smoutput 'tdata' ddcol__db ch
   smoutput '>> ddsel 5 rows'
-  if. _1~: sh=. ch ddsel__db~ 'select * from tdata' do.
+  if. sqlresok__db rc=. ch ddsel__db~ 'select * from tdata' do.
+    sh=. sqlres__db rc
     smoutput '>> ddcolinfo'
     smoutput ddcolinfo__db sh
     smoutput '>> ddcnm'
@@ -148,12 +151,16 @@ if. _1~: ch=. ddcon__db 'database=',f,';nocreate=0' do.
     ddend__db sh
   end.
   smoutput '>> ddfch'
-  if. _1~: sh=. ch ddsel__db~ 'select * from tdata' do.
+  if. sqlresok__db rc=. ch ddsel__db~ 'select * from tdata' do.
+    sh=. sqlres__db rc
+    smoutput ddfch__db sh,_1
     smoutput ddfch__db sh,_1
     ddend__db sh
   end.
   smoutput '>> ddfch__db raw format'
-  if. _1~: sh=. ch ddsel__db~ 'select * from tdata' do.
+  if. sqlresok__db rc=. ch ddsel__db~ 'select * from tdata' do.
+    sh=. sqlres__db rc
+    smoutput r=. _2&ddfch__db sh,_1
     smoutput r=. _2&ddfch__db sh,_1
     ddend__db sh
   end.
@@ -164,14 +171,15 @@ if. _1~: ch=. ddcon__db 'database=',f,';nocreate=0' do.
   smoutput '>> ddttrn'
   smoutput ddttrn__db ch
   smoutput '>> update inside transaction'
-  if. _1= ch ddsql__db~ 'update tdata set SALARY=SALARY + 100' do.
+  if. -.sqlresok__db rc=. ch ddsql__db~ 'update tdata set SALARY=SALARY + 100' do.
     smoutput dderr__db''
   else.
     smoutput '>> ddcnt'
     smoutput ddcnt__db ch
   end.
   smoutput '>> value changed in transaction'
-  if. _1~: sh=. ch ddsel__db~ 'select * from tdata' do.
+  if. sqlresok__db rc=. ch ddsel__db~ 'select * from tdata' do.
+    sh=. sqlres__db rc
     smoutput ddfet__db sh,3
     ddend__db sh
   else.
@@ -183,7 +191,8 @@ if. _1~: ch=. ddcon__db 'database=',f,';nocreate=0' do.
   smoutput ddttrn__db ch
 
   smoutput '>> value restored'
-  if. _1~: sh=. ch ddsel__db~ 'select * from tdata' do.
+  if. sqlresok__db rc=. ch ddsel__db~ 'select * from tdata' do.
+    sh=. sqlres__db rc
     smoutput ddfet__db sh,3
     ddend__db sh
   else.
@@ -200,7 +209,8 @@ if. _1~: ch=. ddcon__db 'database=',f,';nocreate=0' do.
   ddcom__db ch
   smoutput '>> ddttrn'
   smoutput ddttrn__db ch
-  if. _1~: sh=. ch ddsel__db~ 'select * from tdata' do.
+  if. sqlresok__db rc=. ch ddsel__db~ 'select * from tdata' do.
+    sh=. sqlres__db rc
     smoutput ddfet__db sh,3
     ddend__db sh
   end.
@@ -213,24 +223,26 @@ if. _1~: ch=. ddcon__db 'database=',f,';nocreate=0' do.
   if. integerdate do.
     data=. ((len, 5)$'A''BCDEF');((len, 1)$'MF');((len, 4)$'E101E201');((len, 1)$19910213);((len, 1)$20081203);(,. 1+i.len)
   else.
-    if. UseDayNo__db do. 
+    if. UseDayNo__db do.
       data=. ((len,5)$'A''BCDEF');((len,1)$'MF');((len,4)$'E101E201');(len$todayno 1991 2 13);(len$todayno 2008 12 3);(,. 1+i.len)
     else.
       data=. ((len,5)$'A''BCDEF');((len,1)$'MF');((len,4)$'E101E201');((len,10)$'1991-02-13');((len,10)$'2008-12-03');(,. 1+i.len)
     end.
   end.
   smoutput '>> begin insert ', (":len), ' rows'
-  if. _1~: rc=. ch ddins__db~ 'select NAME, SEX, DEPT, DOB, DOH, SALARY from tdata';data do.
+  if. sqlresok__db rc=. ch ddins__db~ 'select NAME, SEX, DEPT, DOB, DOH, SALARY from tdata';data do.
     smoutput '>> finish insert ', (":len), ' rows'
     smoutput '>> ddcnt'
     smoutput ddcnt__db ch
-    if. _1~: sh=. ch ddsel__db~ 'select count(*) from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203' do.
+    if. sqlresok__db rc=. ch ddsel__db~ 'select count(*) from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203' do.
+      sh=. sqlres__db rc
       smoutput ddfet__db sh,_1
       ddend__db sh
     else.
       smoutput dderr__db''
     end.
-    if. _1~: sh=. ch ddsel__db~ 'select * from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203' do.
+    if. sqlresok__db rc=. ch ddsel__db~ 'select * from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203' do.
+      sh=. sqlres__db rc
       smoutput ddfet__db sh,5
       ddend__db sh
     else.
@@ -248,7 +260,8 @@ if. _1~: ch=. ddcon__db 'database=',f,';nocreate=0' do.
     smoutput '>> finish insert ', (":len), ' rows'
     smoutput '>> ddcnt'
     smoutput ddcnt__db ch
-    if. _1~: sh=. ch ddsel__db~ 'select count(*) from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203' do.
+    if. sqlresok__db rc=. ch ddsel__db~ 'select count(*) from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203' do.
+      sh=. sqlres__db rc
       smoutput ddfet__db sh,_1
       ddend__db sh
     else.
@@ -266,7 +279,8 @@ if. _1~: ch=. ddcon__db 'database=',f,';nocreate=0' do.
     smoutput '>> finish insert ', (":len), ' rows'
     smoutput '>> ddcnt'
     smoutput ddcnt__db ch
-    if. _1~: sh=. ch ddsel__db~ 'select count(*) from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203' do.
+    if. sqlresok__db rc=. ch ddsel__db~ 'select count(*) from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203' do.
+      sh=. sqlres__db rc
       smoutput ddfet__db sh,_1
       ddend__db sh
     else.
@@ -277,10 +291,11 @@ if. _1~: ch=. ddcon__db 'database=',f,';nocreate=0' do.
   end.
 
   smoutput '>> ddsparm'
-  if. 0= rc=. ch ddsparm__db~ 'update tdata set PHOTO=? where NAME=?';(>'photo1';'photo2';'photo3');< (>'Abbott K';'Nobody';'Denny D') do.
+  if. sqlresok__db rc=. ch ddsparm__db~ 'update tdata set PHOTO=? where NAME=?';(>'photo1';'photo2';'photo3');< (>'Abbott K';'Nobody';'Denny D') do.
     smoutput '>> ddcnt'
     smoutput ddcnt__db ch
-    if. _1~: sh=. ch ddsel__db~ 'select * from tdata where photo is not null' do.
+    if. sqlresok__db rc=. ch ddsel__db~ 'select * from tdata where photo is not null' do.
+      sh=. sqlres__db rc
       smoutput ddfet__db sh,_1
     else.
       smoutput dderr__db''
@@ -290,10 +305,11 @@ if. _1~: ch=. ddcon__db 'database=',f,';nocreate=0' do.
   end.
 
   smoutput '>> ddsparm box'
-  if. 0= rc=. ch ddsparm__db~ 'update tdata set PHOTO=? where NAME=?';('photo4';'photo5';'photo6');< ('Blamire J';'somebody';'Gordon E') do.
+  if. sqlresok__db rc=. ch ddsparm__db~ 'update tdata set PHOTO=? where NAME=?';('photo4';'photo5';'photo6');< ('Blamire J';'somebody';'Gordon E') do.
     smoutput '>> ddcnt'
     smoutput ddcnt__db ch
-    if. _1~: sh=. ch ddsel__db~ 'select * from tdata where photo is not null' do.
+    if. sqlresok__db rc=. ch ddsel__db~ 'select * from tdata where photo is not null' do.
+      sh=. sqlres__db rc
       smoutput ddfet__db sh,_1
       ddend__db sh
     else.
@@ -306,10 +322,11 @@ if. _1~: ch=. ddcon__db 'database=',f,';nocreate=0' do.
   smoutput '>> ddsparm long binary'
   photo1=. a.{~ ?1e5#256
   photo2=. a.{~ ?5e6#256
-  if. 0= rc=. ch ddsparm__db~ 'update tdata set PHOTO=? where NAME=?';(photo1;photo2);< (>'Abbott K';'Denny D') do.
+  if. sqlresok__db rc=. ch ddsparm__db~ 'update tdata set PHOTO=? where NAME=?';(photo1;photo2);< (>'Abbott K';'Denny D') do.
     smoutput '>> ddcnt'
     smoutput ddcnt__db ch
-    if. _1~: sh=. ch ddsel__db~ 'select NAME,PHOTO from tdata where NAME in (''Abbott K'',''Denny D'') order by NAME' do.
+    if. sqlresok__db rc=. ch ddsel__db~ 'select NAME,PHOTO from tdata where NAME in (''Abbott K'',''Denny D'') order by NAME' do.
+      sh=. sqlres__db rc
       photo=. 1{"1 ddfet__db sh,_1
       ddend__db sh
       smoutput 'photo # ',": #&> photo
