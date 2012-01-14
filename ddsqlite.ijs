@@ -62,35 +62,35 @@ SQLITE_FLOAT=: 2
 SQLITE_TEXT=: SQLITE3_TEXT=: 3
 SQLITE_BLOB=: 4
 SQLITE_NULL=: 5
-SQLITE_OK=: 0            
-SQLITE_ERROR=: 1         
-SQLITE_INTERNAL=: 2      
-SQLITE_PERM=: 3          
-SQLITE_ABORT=: 4         
-SQLITE_BUSY=: 5          
-SQLITE_LOCKED=: 6        
-SQLITE_NOMEM=: 7         
-SQLITE_READONLY=: 8      
-SQLITE_INTERRUPT=: 9     
-SQLITE_IOERR=: 10        
-SQLITE_CORRUPT=: 11      
-SQLITE_NOTFOUND=: 12     
-SQLITE_FULL=: 13         
-SQLITE_CANTOPEN=: 14     
-SQLITE_PROTOCOL=: 15     
-SQLITE_EMPTY=: 16        
-SQLITE_SCHEMA=: 17       
-SQLITE_TOOBIG=: 18       
-SQLITE_CONSTRAINT=: 19   
-SQLITE_MISMATCH=: 20     
-SQLITE_MISUSE=: 21       
-SQLITE_NOLFS=: 22        
-SQLITE_AUTH=: 23         
-SQLITE_FORMAT=: 24       
-SQLITE_RANGE=: 25        
-SQLITE_NOTADB=: 26       
-SQLITE_ROW=: 100         
-SQLITE_DONE=: 101        
+SQLITE_OK=: 0
+SQLITE_ERROR=: 1
+SQLITE_INTERNAL=: 2
+SQLITE_PERM=: 3
+SQLITE_ABORT=: 4
+SQLITE_BUSY=: 5
+SQLITE_LOCKED=: 6
+SQLITE_NOMEM=: 7
+SQLITE_READONLY=: 8
+SQLITE_INTERRUPT=: 9
+SQLITE_IOERR=: 10
+SQLITE_CORRUPT=: 11
+SQLITE_NOTFOUND=: 12
+SQLITE_FULL=: 13
+SQLITE_CANTOPEN=: 14
+SQLITE_PROTOCOL=: 15
+SQLITE_EMPTY=: 16
+SQLITE_SCHEMA=: 17
+SQLITE_TOOBIG=: 18
+SQLITE_CONSTRAINT=: 19
+SQLITE_MISMATCH=: 20
+SQLITE_MISUSE=: 21
+SQLITE_NOLFS=: 22
+SQLITE_AUTH=: 23
+SQLITE_FORMAT=: 24
+SQLITE_RANGE=: 25
+SQLITE_NOTADB=: 26
+SQLITE_ROW=: 100
+SQLITE_DONE=: 101
 SQLITE_OPEN_READONLY=: 16b00000001
 SQLITE_OPEN_READWRITE=: 16b00000002
 SQLITE_OPEN_CREATE=: 16b00000004
@@ -106,9 +106,9 @@ SQLITE_LOCK_EXCLUSIVE=: 4
 SQLITE_UTF8=: 1
 SQLITE_UTF16LE=: 2
 SQLITE_UTF16BE=: 3
-SQLITE_UTF16=: 4            
-SQLITE_ANY=: 5              
-SQLITE_UTF16_ALIGNED=: 8    
+SQLITE_UTF16=: 4
+SQLITE_ANY=: 5
+SQLITE_UTF16_ALIGNED=: 8
 
 SQLITE_STATIC=: 0
 SQLITE_TRANSIENT=: _1
@@ -160,14 +160,14 @@ sqlite3_shutdown=: (libsqlite, ' sqlite3_shutdown > ',(IFWIN#'+'),' i') &cd
 sqlite3_step=: (libsqlite, ' sqlite3_step > ',(IFWIN#'+'),' i x' ) &cd
 sqlite3_table_column_metadata=: (libsqlite, ' sqlite3_table_column_metadata > ',(IFWIN#'+'),' i x *c *c *c *x *x *i *i *i' ) &cd
 sqlite3_total_changes=: (libsqlite, ' sqlite3_total_changes > ',(IFWIN#'+'),' i x' ) &cd
-ISI01=: 'ISI01 Too many connections'  
-ISI02=: 'ISI02 Too many statements'   
+ISI01=: 'ISI01 Too many connections'
+ISI02=: 'ISI02 Too many statements'
 ISI03=: 'ISI03 Bad connection handle'
 ISI04=: 'ISI04 Bad statement handle'
 ISI05=: 'ISI05 Not a select command'
 ISI06=: 'ISI06 Transactions not supported'
 ISI07=: 'ISI07 Bad transaction state'
-ISI08=: 'ISI08 Bad arguments'         
+ISI08=: 'ISI08 Bad arguments'
 ISI09=: 'ISI09 Unsupported data type'
 ISI10=: 'ISI10 Unable to bind all columns'
 ISI11=: 'ISI11 Unable to initialize ODBC environment'
@@ -197,8 +197,8 @@ SQL_NEED_DATA=: 99
 SQL_MAX_DSN_LENGTH=: 32
 SQL_COMMIT=: 0
 SQL_ROLLBACK=: 1
-SQL_BEGIN=: 2          
-SQL_NTS=: _3                     
+SQL_BEGIN=: 2
+SQL_NTS=: _3
 SQL_HANDLE_ENV=: 1
 SQL_HANDLE_DBC=: 2
 SQL_HANDLE_STMT=: 3
@@ -207,13 +207,13 @@ SQL_FETCH_NEXT=: 1
 SQL_FETCH_FIRST=: 2
 SQL_ATTR_ODBC_VERSION=: 200
 SQL_OV_ODBC3=: 3
-SQL_ATTR_ROW_BIND_TYPE=: 5       
-SQL_BIND_BY_COLUMN=: 0           
+SQL_ATTR_ROW_BIND_TYPE=: 5
+SQL_BIND_BY_COLUMN=: 0
 SQL_ATTR_ROWS_FETCHED_PTR=: 26
 SQL_ATTR_ROW_ARRAY_SIZE=: 27
 SQL_ATTR_ROW_STATUS_PTR=: 25
-SQL_ATTR_AUTOCOMMIT=: 102        
-SQL_AUTOCOMMIT_OFF=: 0           
+SQL_ATTR_AUTOCOMMIT=: 102
+SQL_AUTOCOMMIT_OFF=: 0
 SQL_ROWSET_SIZE=: 9
 SQL_IS_UINTEGER=: _5
 
@@ -236,9 +236,9 @@ SQL_CONCUR_LOCK=: 2
 SQL_PARAM_INPUT=: 1
 
 'UCS2 UCS4 UTF8 OEMCP'=: i.4
-COLUMNBUF=: 1000     
-LONGBUF=: 500000     
-SHORTBUF=: 255       
+COLUMNBUF=: 1000
+LONGBUF=: 500000
+SHORTBUF=: 255
 MAXARRAYSIZE=: 65535
 SQL_CHAR_z_=: SQL_CHAR=: 1
 SQL_NUMERIC_z_=: SQL_NUMERIC=: 2
@@ -302,7 +302,7 @@ SQL_LONGVARBINARY
 DD_SUCCESS=: SQLITE_OK
 DD_ERROR=: SQL_ERROR,SQL_INVALID_HANDLE
 DD_OK=: SQLITE_OK
-SZI=: IF64{4 8     
+SZI=: IF64{4 8
 SFX=: >IF64{'32';'64'
 b0=: <"0
 bs=: ];#
@@ -336,7 +336,7 @@ if. UseErrRet do. (<DD_OK), <y else. if. y do. y else. DD_OK end. end.
 )
 sh_to_ch=: 3 : 0
 if. y e. shs=. 1{"1 CSPALL do.
-  if. 2{CSPALL{~ y i.~ shs do. _1 return. end.   
+  if. 2{CSPALL{~ y i.~ shs do. _1 return. end.
 end.
 sqlite3_db_handle y
 )
@@ -487,7 +487,7 @@ else.
   0 15$<''
 end.
 )
-ddconfig=: 3 : 0  
+ddconfig=: 3 : 0
 clr 0
 key=. {.keynvalue=. |: _2]\ y
 value=. {:keynvalue
@@ -500,20 +500,20 @@ for_i. i.#key do.
 end.
 0
 )
-dddriver=: 3 : 0  
+dddriver=: 3 : 0
 clr 0
 'SQLITE'
 )
-dddrv=: 3 : 0  
+dddrv=: 3 : 0
 clr 0
 ret_DD_OK ,:'SQLite3';'SQLite3'
 )
-ddsrc=: 3 : 0  
+ddsrc=: 3 : 0
 clr 0
 ret_DD_OK 0 2$<''
 )
 
-ddtbl=: 3 : 0  
+ddtbl=: 3 : 0
 clr 0
 if. -. isia y do. errret ISI08 return. end.
 if. -. y e. CHALL do. errret ISI03 return. end.
@@ -529,7 +529,7 @@ else.
 end.
 )
 
-ddtblx=: 3 : 0  
+ddtblx=: 3 : 0
 if. -.@sqlresok z=. ddtbl y do. z
 elseif. -.@sqlresok dat=. ddfch sh,_1 [ sh=. sqlres z do. z
 elseif.do. fmtfchres dat [ ddend^:UseErrRet sh
@@ -538,7 +538,7 @@ end.
 ddcheck=: 3 : 0
 if. _1=y do. empty smoutput dderr $0 else. y end.
 )
-ddcol=: 4 : 0  
+ddcol=: 4 : 0
 clr 0
 w=. y
 if. -. (iscl x) *. isia w=. fat w do. errret ISI08 return. end.
@@ -607,7 +607,7 @@ else.
   errret w
 end.
 )
-ddcon=: 3 : 0  
+ddcon=: 3 : 0
 f=. (i.&';')({. ; }.@}.) ]
 clr 0
 if. -.iscl y do. errret ISI08 return. end.
@@ -625,7 +625,7 @@ if. keyname e.~ <'nocreate' do.
 end.
 if. nocreate *. -.fexist dbq do. errret ISI18 return. end.
 
-timeout=. 60000  
+timeout=. 60000
 if. keyname e.~ <'timeout' do.
   timeout=. <. timeout ". '0', >keyvalue {~ keyname i. <'timeout'
 end.
@@ -643,14 +643,14 @@ dddbms HDBC
 ret_DD_OK HDBC
 )
 
-dddis=: 3 : 0"0   
+dddis=: 3 : 0"0
 clr 0
 w=. y
 if. -.isia w=. fat w do. errret ISI08 return. end.
 if. -. w e. CHALL do. errret ISI03 return. end.
 
 if. #sh=. 1{"1 CSPALL#~w=0{"1 CSPALL do. ddend"0 sh end.
-ch=. w 
+ch=. w
 if. sqlbad sqlite3_close w do. errret ch return. end.
 CHALL=: CHALL-.ch
 CSPALL=: CSPALL#~ch~:0{"1 CSPALL
@@ -669,7 +669,7 @@ else.
   rc;_1;''
 end.
 )
-ddsel=: 4 : 0  
+ddsel=: 4 : 0
 clr 0
 if. -.(isia w=. fat y) *. iscl x do. errret ISI08 return. end.
 if. -.w e. CHALL do. errret ISI03 return. end.
@@ -696,7 +696,7 @@ else.
 end.
 )
 
-ddsql=: 4 : 0  
+ddsql=: 4 : 0
 clr DDROWCNT=: 0
 if. -.(isia y) *. iscl x do. errret ISI08 return. end.
 if. -.y e.CHALL do. errret ISI03 return. end.
@@ -712,15 +712,15 @@ else.
 end.
 )
 
-ddfch=: 3 : 0  
+ddfch=: 3 : 0
 1 ddfch y
 :
 clr 0
 if. -. isiu y do. errret ISI08 return. end.
 'sh r'=. 2{.,y,1
 if. -. sh e.1{"1 CSPALL do. errret ISI04 return. end.
-if. 2{CSPALL{~ sh i.~ 1{"1 CSPALL do. errret ISI04 return. end.   
-r=. (r<0){r,_1  
+if. 2{CSPALL{~ sh i.~ 1{"1 CSPALL do. errret ISI04 return. end.
+r=. (r<0){r,_1
 if. 0=#ci=. getallcolinfo sh do.
   errret sh_to_ch sh
 else.
@@ -738,13 +738,13 @@ else.
 end.
 )
 
-ddfet=: 3 : 0  
+ddfet=: 3 : 0
 clr 0
 if. -. isiu y do. errret ISI08 return. end.
 'sh r'=. 2{.,y,1
 if. -. sh e.1{"1 CSPALL do. errret ISI04 return. end.
-if. 2{CSPALL{~ sh i.~ 1{"1 CSPALL do. errret ISI04 return. end.   
-r=. (r<0){r,_1  
+if. 2{CSPALL{~ sh i.~ 1{"1 CSPALL do. errret ISI04 return. end.
+r=. (r<0){r,_1
 if. 0=#ci=. getallcolinfo sh do.
   errret sh_to_ch sh
 else.
@@ -776,11 +776,11 @@ else.
 end.
 )
 
-ddcnt=: 3 : 0  
+ddcnt=: 3 : 0
 ret_DD_OK DDROWCNT
 )
 
-ddend=: 0&$: : (4 : 0)"0  
+ddend=: 0&$: : (4 : 0)"0
 clr 0
 w=. y
 if. -.isia w=. fat w do. errret ISI08 return. end.
@@ -797,12 +797,12 @@ z=. freestmt w
 CSPALL=: CSPALL#~sh~:1{"1 CSPALL
 if. sqlbad z do. errret sh_to_ch sh else. ret_DD_OK DD_OK end.
 )
-dddata=: 3 : 0  
+dddata=: 3 : 0
 clr 0
 w=. >{.y
 if. -. isia w=. fat w do. errret ISI08 return. end.
 if. -.w e.1{"1 CSPALL do. errret ISI04 return. end.
-if. 2{CSPALL{~ w i.~ 1{"1 CSPALL do. ISI04 return. end.   
+if. 2{CSPALL{~ w i.~ 1{"1 CSPALL do. ISI04 return. end.
 c=. >{:y
 if. -. isia c=. fat c do. errret ISI08 return. end.
 if. (0>c) +. c>: ('BINDN',":w)~ do. errret ISI54 return. end.
@@ -814,7 +814,7 @@ clr 0
 w=. >{.y
 if. -. isia w=. fat w do. errret ISI08 return. end.
 if. -.w e.1{"1 CSPALL do. errret ISI04 return. end.
-if. 2{CSPALL{~ w i.~ 1{"1 CSPALL do. ISI04 return. end.   
+if. 2{CSPALL{~ w i.~ 1{"1 CSPALL do. ISI04 return. end.
 c=. >{:y
 if. -. isia c=. fat c do. errret ISI08 return. end.
 if. (0>c) +. c>: ('BINDN',":w)~ do. errret ISI54 return. end.
@@ -822,25 +822,25 @@ if. (0>c) +. c>: ('BINDN',":w)~ do. errret ISI54 return. end.
 ". ::(''"_) 'BINDLN',(":w),'_',":c
 )
 
-dddcnt=: 3 : 0  
+dddcnt=: 3 : 0
 clr 0
 w=. y
 if. -. isia w=. fat w do. errret ISI08 return. end.
 if. -.w e.1{"1 CSPALL do. errret ISI04 return. end.
-if. 2{CSPALL{~ w i.~ 1{"1 CSPALL do. ISI04 return. end.   
+if. 2{CSPALL{~ w i.~ 1{"1 CSPALL do. ISI04 return. end.
 
 errret ISI14
 )
-ddrow=: dddcnt 
+ddrow=: dddcnt
 
 initodbcenv=: 3 : 0
-CHTR=: CHALL=: i.0  
-CSPALL=: 0 3$0      
-DBMSALL=: 0 12$<''  
-LERR=: ''           
-ALLDM=: i. 0 3      
-BADTYPES=: i. 0 0   
-DDROWCNT=: 0        
+CHTR=: CHALL=: i.0
+CSPALL=: 0 3$0
+DBMSALL=: 0 12$<''
+LERR=: ''
+ALLDM=: i. 0 3
+BADTYPES=: i. 0 0
+DDROWCNT=: 0
 
 DD_OK
 )
@@ -853,24 +853,24 @@ if. set <'CHALL' do. if. #CHALL do. dddis CHALL end. end.
 erase ;:'CSPALL CHALL CHTR'
 )
 
-ddcnm=: 3 : 0  
+ddcnm=: 3 : 0
 clr 0
 w=. y
 if. -. isia w=. fat w do. errret ISI08 return. end.
 if. -.w e.1{"1 CSPALL do. errret ISI04 return. end.
-if. 2{CSPALL{~ w i.~ 1{"1 CSPALL do. ISI04 return. end.   
+if. 2{CSPALL{~ w i.~ 1{"1 CSPALL do. ISI04 return. end.
 if. 0=#ci=. getallcolinfo w do. errret sh_to_ch w return. end.
 assert. 15= {:@$ ci
 ret_DD_OK 4{"1 ci
 )
 
-dderr=: 3 : 0  
+dderr=: 3 : 0
 0 dderr y
 :
 LERR
 )
 
-ddtrn=: 3 : 0  
+ddtrn=: 3 : 0
 clr 0
 w=. fat y
 if. -. isia w=. fat w do. errret ISI08 return. end.
@@ -901,14 +901,14 @@ else.
 end.
 )
 
-ddcom=: 3 : 0  
+ddcom=: 3 : 0
 SQL_COMMIT comrbk y
 )
 
-ddrbk=: 3 : 0  
+ddrbk=: 3 : 0
 SQL_ROLLBACK comrbk y
 )
-ddttrn=: 3 : 0"0  
+ddttrn=: 3 : 0"0
 if. _1~: y do.
   if. y e. CHALL do.
     0= sqlite3_get_autocommit y
@@ -922,7 +922,7 @@ else.
   0
 end.
 )
-dddbms=: 3 : 0  
+dddbms=: 3 : 0
 if. -. isia y=. fat y do. errret ISI08 return. end.
 if. -.y e. CHALL do. errret ISI03 return. end.
 ch=. y
@@ -932,7 +932,7 @@ if. ch e. >0{("1) DBMSALL do.
   return.
 end.
 bugflag=. 0
-chardiv=. 1  
+chardiv=. 1
 charset=. UTF8
 dsn=. ''
 uid=. ''
@@ -950,7 +950,7 @@ ddcolinfo=: 3 : 0
 clr 0
 if. -. isia y=. fat y do. errret ISI08 return. end.
 if. -.y e. 1{"1 CSPALL do. errret ISI04 return. end.
-if. 2{CSPALL{~ y i.~ 1{"1 CSPALL do. errret ISI04 return. end.   
+if. 2{CSPALL{~ y i.~ 1{"1 CSPALL do. errret ISI04 return. end.
 sh=. y
 if. 0= #ci=. getallcolinfo sh do.
   z=. errret sh_to_ch sh
@@ -1012,7 +1012,7 @@ if. (,a:)-:tbl do.
   elseif. do. errret ISI08 return. end.
   tbl=. < tbl -. '+/()*,-.:;=?@\^_`{|}'''
 end.
-if. (1~:#tbl) +. a: e. tbl do.  
+if. (1~:#tbl) +. a: e. tbl do.
   errret ISI52 return.
 end.
 if. (<:#x)~:#ty do.
@@ -1022,7 +1022,7 @@ inssql=. 'insert into ', (>@{.tbl), '(', (}. ; (<',') ,("0) flds), ') values (',
 z=. (inssql ; (|: oty,.lns,.ty) ; (}.x)) ddparm y
 )
 parsesqlparm=: 3 : 0
-fmt=. 0  
+fmt=. 0
 if. ('insert into' ; 'select into') e.~ <tolower 11{.y=. dlb y do. ix=. 11 [ fmt=. 1
 elseif. 'insert ' -: tolower 7{.y do. ix=. 6 [ fmt=. 1
 elseif. 'delete from' -: tolower 11{.y do. ix=. 11
@@ -1039,15 +1039,15 @@ if. 1=fmt do.
 end.
 if. 0=fmt do.
   y1=. y
-  f1=. (0=(2&|)) +/\ ''''=y1  
-  f2=. (> 0:,}:) f1           
-  f2=. 0,}.f2                 
-  y1=. ' ' (I.-.f1)}y1        
-  y1=. ' ' (I.f2)}y1          
-  f1=. 0< (([: +/\ '('&=) - ([: +/\ ')'&=)) y1    
-  y1=. ' ' (I.f1 *. ','=y1)}y1    
-  y1=. ' ' (I.y1 e.'()')}y1    
-  y1=. (' where ';', where ';' WHERE ';', WHERE ';' and ';', and ';' AND ';', AND ';' or ';', or ';' OR ';', OR ') stringreplace (deb y1) , ','  
+  f1=. (0=(2&|)) +/\ ''''=y1
+  f2=. (> 0:,}:) f1
+  f2=. 0,}.f2
+  y1=. ' ' (I.-.f1)}y1
+  y1=. ' ' (I.f2)}y1
+  f1=. 0< (([: +/\ '('&=) - ([: +/\ ')'&=)) y1
+  y1=. ' ' (I.f1 *. ','=y1)}y1
+  y1=. ' ' (I.y1 e.'()')}y1
+  y1=. (' where ';', where ';' WHERE ';', WHERE ';' and ';', and ';' AND ';', AND ';' or ';', or ';' OR ';', OR ') stringreplace (deb y1) , ','
   a=. (',' = y1) <;._2 y1
   b=. (#~ ('='&e. *. '?'&e.)&>) a
   c=. ({.~ i:&'=')&.> b
@@ -1056,16 +1056,16 @@ else.
   fld=. <@dltb;._1 ',', ' ' (I.a e.'()')} a=. (}.~ i.&'(') y{.~ iv
 
   y1=. y}.~ iv + #' values '
-  f1=. (0=(2&|)) +/\ ''''=y1  
-  f2=. (> 0:,}:) f1           
-  f2=. 0,}.f2                 
-  y1=. ' ' (I.-.f1)}y1        
-  y1=. ' ' (I.f2)}y1          
-  y1=. }.}:dltb y1            
-  f1=. 0< (([: +/\ '('&=) - ([: +/\ ')'&=)) y1    
-  y1=. ' ' (I.f1 *. ','=y1)}y1    
-  y1=. ' ' (I.y1 e.'()')}y1    
-  y1=. (deb y1),','   
+  f1=. (0=(2&|)) +/\ ''''=y1
+  f2=. (> 0:,}:) f1
+  f2=. 0,}.f2
+  y1=. ' ' (I.-.f1)}y1
+  y1=. ' ' (I.f2)}y1
+  y1=. }.}:dltb y1
+  f1=. 0< (([: +/\ '('&=) - ([: +/\ ')'&=)) y1
+  y1=. ' ' (I.f1 *. ','=y1)}y1
+  y1=. ' ' (I.y1 e.'()')}y1
+  y1=. (deb y1),','
   a=. <;._2 y1
   msk=. ('?'&e.)&> a
   parm=. ((#fld){.msk)#fld
@@ -1114,7 +1114,7 @@ if. 2=$$tyln do.
     assert. 0
   end.
 else.
-  sqlty=. tyln [ lns=. (#tyln)#_2 
+  sqlty=. tyln [ lns=. (#tyln)#_2
 end.
 if. ''-:ty do.
   try.
@@ -1155,7 +1155,7 @@ bindname=. 'BIND',(":sh)
 assert. 0~: nc <bindname
 
 ('BINDN',":sh)=: #ty
-('BINDIO',":sh)=: 0        
+('BINDIO',":sh)=: 0
 
 ec=. SQLITE_OK
 for_i. i.ncol do.
@@ -1444,7 +1444,7 @@ while.do.
     end.
   end.
 
-  if. 0=r=. <:r do. break. end.  
+  if. 0=r=. <:r do. break. end.
   z=. sqlite3_step sh
 end.
 if. 0=#(pref,":0)~ do.
