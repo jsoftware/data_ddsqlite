@@ -55,6 +55,7 @@ case. 'Linux' do. libsqlite=: 'libsqlite3.so.0'
 case. 'Android' do. libsqlite=: 'libsqlite.so'
 case. 'Darwin' do. libsqlite=: 'libsqlite3.0.dylib'
 case. 'Win' do. libsqlite=: 'sqlite3.dll'
+case. do. libsqlite=: ''
 end.
 i.0 0
 )
