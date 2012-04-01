@@ -6,5 +6,8 @@ data/ddsqlite - change history
 == 1.0.1 ==
  * bug fix. update test scripts
 
-== 1.0.2 ==
+== 1.0.2/3 ==
  * ddparm accepts NULL datetime, add 64-bit windows binary
+
+== 1.0.4 ==
+ * android

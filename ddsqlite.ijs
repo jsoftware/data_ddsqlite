@@ -162,6 +162,15 @@ sqlite3_shutdown=: (libsqlite, ' sqlite3_shutdown > ',(IFWIN#'+'),' i') &cd
 sqlite3_step=: (libsqlite, ' sqlite3_step > ',(IFWIN#'+'),' i x' ) &cd
 sqlite3_table_column_metadata=: (libsqlite, ' sqlite3_table_column_metadata > ',(IFWIN#'+'),' i x *c *c *c *x *x *i *i *i' ) &cd
 sqlite3_total_changes=: (libsqlite, ' sqlite3_total_changes > ',(IFWIN#'+'),' i x' ) &cd
+3 : 0''
+if. 'Android'-:UNAME do.
+  sqlite3_column_database_name=: 0:
+  sqlite3_column_origin_name=: 0:
+  sqlite3_column_table_name=: 0:
+  sqlite3_table_column_metadata=: 0:
+end.
+EMPTY
+)
 ISI01=: 'ISI01 Too many connections'
 ISI02=: 'ISI02 Too many statements'
 ISI03=: 'ISI03 Bad connection handle'
