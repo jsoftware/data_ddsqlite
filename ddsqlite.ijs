@@ -167,7 +167,7 @@ if. 'Android'-:UNAME do.
   sqlite3_column_database_name=: 0:
   sqlite3_column_origin_name=: 0:
   sqlite3_column_table_name=: 0:
-  sqlite3_table_column_metadata=: 0:
+  sqlite3_table_column_metadata=: 1:
 end.
 EMPTY
 )
