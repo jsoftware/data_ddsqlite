@@ -14,3 +14,6 @@ data/ddsqlite - change history
 
 == 1.0.10 ==
  * ddfch should coerce long data to empty
+
+== 1.0.11 ==
+ * j801

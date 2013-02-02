@@ -11,9 +11,9 @@ For 32-bit windows, download from http://www.sqlite.org/download.html. Binary fo
 See wiki page http://www.jsoftware.com/jwiki/JDD for help.
 )
 
-VERSION=: '1.0.10'
+VERSION=: '1.0.11'
 
-RELEASE=: 'j602 j701'
+RELEASE=: 'j602 j701 j801'
 
 FILES=: 0 : 0
 history.txt
