@@ -219,7 +219,7 @@ if. sqlresok__db rc=. ddcon__db 'database=',f,';nocreate=0' do.
   smoutput dderr__db''
 
   smoutput '>> ddins'
-  len=. 1e5
+  len=. 1e3
   if. integerdate do.
     data=. ((len, 5)$'A''BCDEF');((len, 1)$'MF');((len, 4)$'E101E201');((len, 1)$19910213);((len, 1)$20081203);(,. 1+i.len)
   else.
@@ -327,7 +327,7 @@ if. sqlresok__db rc=. ddcon__db 'database=',f,';nocreate=0' do.
     smoutput ddcnt__db ch
     if. sqlresok__db rc=. ch ddsel__db~ 'select NAME,PHOTO from tdata where NAME in (''Abbott K'',''Denny D'') order by NAME' do.
       sh=. sqlres__db rc
-      photo=. 1{"1 ddfet__db sh,_1
+      photo=. 1{"1 a=. sqlres__db ddfet__db sh,_1
       ddend__db sh
       smoutput 'photo # ',": #&> photo
       if. photo -: photo1;photo2 do.

@@ -201,7 +201,7 @@ if. _1~: ch=. ddcon 'database=',f,';nocreate=0' do.
   smoutput dderr''
 
   smoutput '>> ddins'
-  len=. 1e5
+  len=. 1e3
   if. integerdate do.
     data=. ((len, 5)$'A''BCDEF');((len, 1)$'MF');((len, 4)$'E101E201');((len, 1)$19910213);((len, 1)$20081203);(,. 1+i.len)
   else.
