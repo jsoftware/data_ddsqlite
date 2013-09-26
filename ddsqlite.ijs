@@ -630,7 +630,7 @@ if. keyname e.~ <'timeout' do.
 end.
 
 handle=. ,_1
-if. SQLITE_OK~: sqlite3_open_v2 dbq;handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_FULLMUTEX+SQLITE_OPEN_SHAREDCACHE+(nocreate{SQLITE_OPEN_CREATE,0));<<0 do.
+if. SQLITE_OK~: sqlite3_open_v2 (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_FULLMUTEX+SQLITE_OPEN_SHAREDCACHE+(nocreate{SQLITE_OPEN_CREATE,0));<<0 do.
   errret ISI19 return.
 end.
 sqlite3_extended_result_codes handle, 1
@@ -1506,7 +1506,7 @@ if. -.iscl y do. _2 return. end.
 dbq=. utf8 ,>y
 if. fexist dbq do. _1 return. end.
 handle=. ,_1
-if. SQLITE_OK~: rc=. sqlite3_open_v2 dbq;handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_CREATE);<<0 do.
+if. SQLITE_OK~: rc=. sqlite3_open_v2 (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_CREATE);<<0 do.
   rc
 else.
   0 [ sqlite3_close {.handle
