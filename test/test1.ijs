@@ -154,13 +154,11 @@ if. sqlresok__db rc=. ddcon__db 'database=',f,';nocreate=0' do.
   if. sqlresok__db rc=. ch ddsel__db~ 'select * from tdata' do.
     sh=. sqlres__db rc
     smoutput ddfch__db sh,_1
-    smoutput ddfch__db sh,_1
     ddend__db sh
   end.
   smoutput '>> ddfch__db raw format'
   if. sqlresok__db rc=. ch ddsel__db~ 'select * from tdata' do.
     sh=. sqlres__db rc
-    smoutput r=. _2&ddfch__db sh,_1
     smoutput r=. _2&ddfch__db sh,_1
     ddend__db sh
   end.

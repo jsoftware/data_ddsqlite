@@ -589,10 +589,10 @@ if. SQLITE_OK = >@{. z=. ('select * from ', x,' where 1=0') preparestmt y do.
         end.
         r=. r, cat;db;tb;column;data_type;type_name;col_size;buflen;0;radix;nullable;'';dflt;sql_data_type;sub;char_octlen;(>:i);(nullable{::'NO';'YES')
       else.
-        err=. 1 break.
+        errret ISI14 [ freestmt sh return.
       end.
     else.
-      err=. 1 break.
+      errret ISI14 [ freestmt sh return.
     end.
   end.
   if. 1=err do. errret w [ freestmt sh return. end.
