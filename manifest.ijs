@@ -13,7 +13,7 @@ See wiki page http://www.jsoftware.com/jwiki/JDD for help.
 
 VERSION=: '1.0.16'
 
-RELEASE=: 'j701 j801'
+RELEASE=: 'j802'
 
 FILES=: 0 : 0
 history.txt
