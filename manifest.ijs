@@ -27,3 +27,4 @@ FILESWIN64=: 0 : 0
 lib/sqlite3.dll
 )
 
+PLATFORMS=: 'linux win darwin android'
