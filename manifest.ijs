@@ -11,9 +11,9 @@ For 32-bit windows, download from http://www.sqlite.org/download.html. Binary fo
 See wiki page http://www.jsoftware.com/jwiki/JDD for help.
 )
 
-VERSION=: '1.0.19'
+VERSION=: '1.0.20'
 
-RELEASE=: 'j802'
+RELEASE=: 'j802 j803'
 
 FILES=: 0 : 0
 history.txt
@@ -26,4 +26,3 @@ test/test2.ijs
 FILESWIN64=: 0 : 0
 lib/sqlite3.dll
 )
-
