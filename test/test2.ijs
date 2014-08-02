@@ -3,6 +3,7 @@ cocurrent 'base'
 load 'data/ddsqlite'
 
 integerdate=: 0
+UseDayNo=: 1
 
 tdata_ddl=: 0 : 0
 create table tdata (
@@ -90,7 +91,7 @@ NB. =========================================================
 testdb=: 3 : 0
 setzlocale_jddsqlite_ ''
 
-ddconfig 'errret';0;'dayno';0;'unicode';1
+ddconfig 'errret';0;'dayno';UseDayNo;'unicode';1
 
 smoutput '>> dddriver'
 smoutput dddriver''
@@ -104,9 +105,11 @@ smoutput ddsrc''
 smoutput '>> delete old database'
 f=. jpath '~temp/jdata.sqlite'
 1!:55 ::0: <f
+assert. 0=#1!:0 f
 
 smoutput '>> create empty database'
 '' 1!:2 <f
+assert. 1=#1!:0 f
 
 smoutput '>> open database'
 if. _1~: ch=. ddcon 'database=',f,';nocreate=0' do.
@@ -205,10 +208,10 @@ if. _1~: ch=. ddcon 'database=',f,';nocreate=0' do.
   if. integerdate do.
     data=. ((len, 5)$'A''BCDEF');((len, 1)$'MF');((len, 4)$'E101E201');((len, 1)$19910213);((len, 1)$20081203);(,. 1+i.len)
   else.
-    if. UseDayNo_jddsqlite_ do. 
-      data=. ((len,5)$'A''BCDEF');((len,1)$'MF');((len,4)$'E101E201');(len$todayno 1991 2 13);(len$todayno 2008 12 3);(,. 1+i.len)
+    if. UseDayNo do.
+      data=. ((len,5)$'A''BCDEF');((len,1)$'MF');((len,4)$'E101E201');(len$todayno 1991 2 13);(len$DateTimeNull_jddsqlite_,todayno 2008 12 3);(,.len$NumericNull_jddsqlite_,len)
     else.
-      data=. ((len,5)$'A''BCDEF');((len,1)$'MF');((len,4)$'E101E201');((len,10)$'1991-02-13');((len,10)$'2008-12-03');(,. 1+i.len)
+      data=. ((len,5)$'A''BCDEF');((len,1)$'MF');((len,4)$'E101E201');((len,10)$'1991-02-13');((len,10)$'          2008-12-03');(,.len$NumericNull_jddsqlite_,len)
     end.
   end.
   smoutput '>> begin insert ', (":len), ' rows'
@@ -224,6 +227,12 @@ if. _1~: ch=. ddcon 'database=',f,';nocreate=0' do.
     end.
     if. _1~: sh=. ch ddsel~ 'select * from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203' do.
       smoutput ddfet sh,5
+      ddend sh
+    else.
+      smoutput dderr''
+    end.
+    if. _1~: sh=. ch ddsel~ 'select * from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203' do.
+      smoutput ddfch sh,5
       ddend sh
     else.
       smoutput dderr''
@@ -302,7 +311,7 @@ if. _1~: ch=. ddcon 'database=',f,';nocreate=0' do.
     smoutput '>> ddcnt'
     smoutput ddcnt ch
     if. _1~: sh=. ch ddsel~ 'select NAME,PHOTO from tdata where NAME in (''Abbott K'',''Denny D'') order by NAME' do.
-      photo=. 1{"1 ddfet sh,_1
+      photo=. ~. 1{"1 ddfet sh,_1
       ddend sh
       smoutput 'photo # ',": #&> photo
       if. photo -: photo1;photo2 do.

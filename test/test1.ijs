@@ -10,6 +10,7 @@ wrds=. ;: wrds ,' dddriver ddconfig'
 load 'data/ddsqlite'
 
 integerdate=: 0
+UseDayNo=: 0
 
 tdata_ddl=: 0 : 0
 create table tdata (
@@ -98,7 +99,7 @@ testdb=: 3 : 0
 NB. setzlocale_jddsqlite_ ''
 db=. '' conew 'jddsqlite'
 
-ddconfig__db 'errret';1;'dayno';0;'unicode';1
+ddconfig__db 'errret';0;'dayno';UseDayNo;'unicode';1
 
 smoutput '>> dddriver'
 smoutput dddriver__db''
@@ -112,9 +113,11 @@ smoutput ddsrc__db''
 smoutput '>> delete old database'
 f=. jpath '~temp/jdata.sqlite'
 1!:55 ::0: <f
+assert. 0=#1!:0 f
 
 smoutput '>> create empty database'
 '' 1!:2 <f
+assert. 1=#1!:0 f
 
 smoutput '>> open database'
 if. sqlresok__db rc=. ddcon__db 'database=',f,';nocreate=0' do.
@@ -221,10 +224,10 @@ if. sqlresok__db rc=. ddcon__db 'database=',f,';nocreate=0' do.
   if. integerdate do.
     data=. ((len, 5)$'A''BCDEF');((len, 1)$'MF');((len, 4)$'E101E201');((len, 1)$19910213);((len, 1)$20081203);(,. 1+i.len)
   else.
-    if. UseDayNo__db do.
-      data=. ((len,5)$'A''BCDEF');((len,1)$'MF');((len,4)$'E101E201');(len$todayno 1991 2 13);(len$todayno 2008 12 3);(,. 1+i.len)
+    if. UseDayNo do.
+      data=. ((len,5)$'A''BCDEF');((len,1)$'MF');((len,4)$'E101E201');(len$todayno 1991 2 13);(len$DateTimeNull__db,todayno 2008 12 3);(,.len$NumericNull__db,len)
     else.
-      data=. ((len,5)$'A''BCDEF');((len,1)$'MF');((len,4)$'E101E201');((len,10)$'1991-02-13');((len,10)$'2008-12-03');(,. 1+i.len)
+      data=. ((len,5)$'A''BCDEF');((len,1)$'MF');((len,4)$'E101E201');((len,10)$'1991-02-13');((len,10)$'          2008-12-03');(,.len$NumericNull__db,len)
     end.
   end.
   smoutput '>> begin insert ', (":len), ' rows'
@@ -232,16 +235,23 @@ if. sqlresok__db rc=. ddcon__db 'database=',f,';nocreate=0' do.
     smoutput '>> finish insert ', (":len), ' rows'
     smoutput '>> ddcnt'
     smoutput ddcnt__db ch
-    if. sqlresok__db rc=. ch ddsel__db~ 'select count(*) from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203' do.
+    if. sqlresok__db rc=. ch ddsel__db~ 'select count(*) from tdata where DOH is null or DOH=', integerdate{::'''2008-12-03''';'20081203' do.
       sh=. sqlres__db rc
       smoutput ddfet__db sh,_1
       ddend__db sh
     else.
       smoutput dderr__db''
     end.
-    if. sqlresok__db rc=. ch ddsel__db~ 'select * from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203' do.
+    if. sqlresok__db rc=. ch ddsel__db~ 'select * from tdata where DOH is null or DOH=', integerdate{::'''2008-12-03''';'20081203' do.
       sh=. sqlres__db rc
       smoutput ddfet__db sh,5
+      ddend__db sh
+    else.
+      smoutput dderr__db''
+    end.
+    if. sqlresok__db rc=. ch ddsel__db~ 'select * from tdata where DOH is null or DOH=', integerdate{::'''2008-12-03''';'20081203' do.
+      sh=. sqlres__db rc
+      smoutput ddfch__db sh,5
       ddend__db sh
     else.
       smoutput dderr__db''

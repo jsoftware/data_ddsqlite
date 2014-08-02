@@ -17,3 +17,6 @@ data/ddsqlite - change history
 
 == 1.0.11/.. ==
  * j801
+
+== 1.0.14 ==
+ * DateTimeNull (default _1) NumericNull (default _)

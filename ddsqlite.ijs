@@ -1,6 +1,8 @@
 
 coclass 'jddsqlite'
 
+DateTimeNull=: _1
+NumericNull=: _
 InitDone=: 0
 UseErrRet=: 0
 UseDayNo=: 0
@@ -1162,11 +1164,15 @@ for_i. i.ncol do.
   bnamel=. 'BINDLN',(":sh),'_',":i
   select. t=. i{ty
   case. SQL_INTEGER do.
-    nr=. #(bname)=: <.,(i+of){::x
+    nul=. (0~:NumericNull) *. NumericNull= da=. ,(i+of){::x
+    nr=. #(bname)=: <. 0 (I.nul)}da
     (bnamel)=: nr$IF64{4 8
+    (bnamel)=: SQL_NULL_DATA (I. nul)} bnamel~
   case. SQL_DOUBLE do.
-    nr=. #(bname)=: (1.1-1.1)+,(i+of){::x
+    nul=. (0~:NumericNull) *. NumericNull= da=. (1.1-1.1)+ ,(i+of){::x
+    nr=. #(bname)=: (1.1-1.1) (I.nul)}da
     (bnamel)=: nr$8
+    (bnamel)=: SQL_NULL_DATA (I. nul)} bnamel~
   case. SQL_CHAR;SQL_WCHAR;SQL_VARCHAR;SQL_WVARCHAR;SQL_LONGVARCHAR;SQL_WLONGVARCHAR do.
     if. L. da=. (i+of){::x do.
       if. 0 e. (2 e.~ 3!:0)&> da do.
@@ -1200,7 +1206,8 @@ for_i. i.ncol do.
       if. 1 4 8 -.@e.~ 3!:0 da=. (i+of){::x do.
         ec=. SQL_ERROR break.
       end.
-      da=. isotimestamp 1 tsrep <.86400000* da0=. ,da
+      nul=. DateTimeNull= da=. ,da
+      da=. isotimestamp 1 tsrep <.86400000* 0 (I.nul)}da
       if. SQL_TYPE_TIMESTAMP= t do. (bname)=: 23{."1 da
       elseif. SQL_TYPE_DATE= t do. (bname)=: 10{."1 da
       elseif. SQL_TYPE_TIME= t do. (bname)=: 11}."1 da
@@ -1208,11 +1215,7 @@ for_i. i.ncol do.
       lns=. (ls=. {:@$ da) i}lns
       nr=. #da
       (bnamel)=: nr$ls
-      if. t e. SQL_TYPE_TIMESTAMP,SQL_TYPE_DATE do.
-        if. 1 e. nul=. 0= da0 do.
-          (bnamel)=: SQL_NULL_DATA (I. nul)} bnamel~
-        end.
-      end.
+      (bnamel)=: SQL_NULL_DATA (I. nul)} bnamel~
     else.
       if. 2 131072 -.@e.~ 3!:0 da=. (i+of){::x do.
         ec=. SQL_ERROR break.
@@ -1225,10 +1228,8 @@ for_i. i.ncol do.
       lns=. (ls=. {:@$ da) i}lns
       nr=. #da
       (bnamel)=: nr$ls
-      if. t e. SQL_TYPE_TIMESTAMP,SQL_TYPE_DATE do.
-        if. 1 e. nul=. (+./("1) '1800-01-01'&E.("1) da) +. (+./("1) 'NULL'&E.("1) da) do.
-          (bnamel)=: SQL_NULL_DATA (I. nul)} bnamel~
-        end.
+      if. 1 e. nul=. (*./"1 e.&' '"1 da) +. (+./"1 '1800-01-01'&E."1 da) +. (+./"1 'NULL'&E."1 da) do.
+        (bnamel)=: SQL_NULL_DATA (I. nul)} bnamel~
       end.
     end.
   case. do.
@@ -1395,50 +1396,72 @@ while.do.
   end.
 
   for_i. i.#ty do.
-    if. SQL_INTEGER = i{ty do.
-      (pref,":i)=. (pref,":i)~, datinteger i{cc
-    elseif. SQL_DOUBLE = i{ty do.
-      (pref,":i)=. (pref,":i)~, datdouble i{cc
-    elseif. (SQL_CHAR,SQL_WCHAR,SQL_VARCHAR,SQL_WVARCHAR) e.~ i{ty do.
-      (pref,":i)=. (pref,":i)~, datchar i{cc
-    elseif. (SQL_LONGVARCHAR,SQL_WLONGVARCHAR) e.~ i{ty do.
-      (pref,":i)=. (pref,":i)~, (<@:ucp@:}:@:datchar)`((<'')"_)@.ignorelongdata i{cc
-    elseif. SQL_LONGVARBINARY = i{ty do.
-      (pref,":i)=. (pref,":i)~, datblob`((<'')"_)@.ignorelongdata i{cc
-    elseif. SQL_TYPE_DATE = i{ty do.
-      (pref,":i)=. (pref,":i)~, datdate i{cc
-    elseif. SQL_TYPE_TIME = i{ty do.
-      (pref,":i)=. (pref,":i)~, dattime i{cc
-    elseif. SQL_TYPE_TIMESTAMP = i{ty do.
-      (pref,":i)=. (pref,":i)~, datdatetime i{cc
-    elseif. do.
-      't d'=. datnull i{cc
-      if. SQL_INTEGER = t do.
-        ty=. t i}ty
-        (pref,":i)=. (0$~#(pref,":i)~), d
-      elseif. SQL_DOUBLE = t do.
-        ty=. t i}ty
-        (pref,":i)=. (0$~#(pref,":i)~), d
-      elseif. (SQL_CHAR,SQL_WCHAR,SQL_VARCHAR,SQL_WVARCHAR) e.~ t do.
-        ty=. t i}ty
-        (pref,":i)=. (({.a.)$~#(pref,":i)~), d
-      elseif. (SQL_LONGVARCHAR,SQL_WLONGVARCHAR) e.~ t do.
-        ty=. t i}ty
-        (pref,":i)=. (({.a.)$~#(pref,":i)~), d
-      elseif. SQL_LONGVARBINARY = t do.
-        ty=. t i}ty
-        (pref,":i)=. ((<'')$~#(pref,":i)~), d
-      elseif. SQL_TYPE_DATE = t do.
-        ty=. t i}ty
-        (pref,":i)=. (({.a.)$~#(pref,":i)~), d
-      elseif. SQL_TYPE_TIME = t do.
-        ty=. t i}ty
-        (pref,":i)=. (({.a.)$~#(pref,":i)~), d
-      elseif. SQL_TYPE_TIMESTAMP = t do.
-        ty=. t i}ty
-        (pref,":i)=. (({.a.)$~#(pref,":i)~), d
+    if. SQLITE_NULL= sqlite3_column_type (b0 i{cc) do.
+      if. SQL_INTEGER = i{ty do.
+        (pref,":i)=. (pref,":i)~, NumericNull
+      elseif. SQL_DOUBLE = i{ty do.
+        (pref,":i)=. (pref,":i)~, NumericNull
+      elseif. (SQL_CHAR,SQL_WCHAR,SQL_VARCHAR,SQL_WVARCHAR) e.~ i{ty do.
+        (pref,":i)=. (pref,":i)~, {.a.
+      elseif. (SQL_LONGVARCHAR,SQL_WLONGVARCHAR) e.~ i{ty do.
+        (pref,":i)=. (pref,":i)~, {.a.
+      elseif. SQL_LONGVARBINARY = i{ty do.
+        (pref,":i)=. (pref,":i)~, <''
+      elseif. SQL_TYPE_DATE = i{ty do.
+        (pref,":i)=. (pref,":i)~, {.a.
+      elseif. SQL_TYPE_TIME = i{ty do.
+        (pref,":i)=. (pref,":i)~, {.a.
+      elseif. SQL_TYPE_TIMESTAMP = i{ty do.
+        (pref,":i)=. (pref,":i)~, {.a.
       elseif. do.
-        (pref,":i)=. (pref,":i)~, d
+        (pref,":i)=. (pref,":i)~, {.a.
+      end.
+    else.
+      if. SQL_INTEGER = i{ty do.
+        (pref,":i)=. (pref,":i)~, datinteger i{cc
+      elseif. SQL_DOUBLE = i{ty do.
+        (pref,":i)=. (pref,":i)~, datdouble i{cc
+      elseif. (SQL_CHAR,SQL_WCHAR,SQL_VARCHAR,SQL_WVARCHAR) e.~ i{ty do.
+        (pref,":i)=. (pref,":i)~, datchar i{cc
+      elseif. (SQL_LONGVARCHAR,SQL_WLONGVARCHAR) e.~ i{ty do.
+        (pref,":i)=. (pref,":i)~, (<@:ucp@:}:@:datchar)`((<'')"_)@.ignorelongdata i{cc
+      elseif. SQL_LONGVARBINARY = i{ty do.
+        (pref,":i)=. (pref,":i)~, datblob`((<'')"_)@.ignorelongdata i{cc
+      elseif. SQL_TYPE_DATE = i{ty do.
+        (pref,":i)=. (pref,":i)~, datdate i{cc
+      elseif. SQL_TYPE_TIME = i{ty do.
+        (pref,":i)=. (pref,":i)~, dattime i{cc
+      elseif. SQL_TYPE_TIMESTAMP = i{ty do.
+        (pref,":i)=. (pref,":i)~, datdatetime i{cc
+      elseif. do.
+        't d'=. datnull i{cc
+        if. SQL_INTEGER = t do.
+          ty=. t i}ty
+          (pref,":i)=. (0$~#(pref,":i)~), d
+        elseif. SQL_DOUBLE = t do.
+          ty=. t i}ty
+          (pref,":i)=. (0$~#(pref,":i)~), d
+        elseif. (SQL_CHAR,SQL_WCHAR,SQL_VARCHAR,SQL_WVARCHAR) e.~ t do.
+          ty=. t i}ty
+          (pref,":i)=. (({.a.)$~#(pref,":i)~), d
+        elseif. (SQL_LONGVARCHAR,SQL_WLONGVARCHAR) e.~ t do.
+          ty=. t i}ty
+          (pref,":i)=. (({.a.)$~#(pref,":i)~), d
+        elseif. SQL_LONGVARBINARY = t do.
+          ty=. t i}ty
+          (pref,":i)=. ((<'')$~#(pref,":i)~), d
+        elseif. SQL_TYPE_DATE = t do.
+          ty=. t i}ty
+          (pref,":i)=. (({.a.)$~#(pref,":i)~), d
+        elseif. SQL_TYPE_TIME = t do.
+          ty=. t i}ty
+          (pref,":i)=. (({.a.)$~#(pref,":i)~), d
+        elseif. SQL_TYPE_TIMESTAMP = t do.
+          ty=. t i}ty
+          (pref,":i)=. (({.a.)$~#(pref,":i)~), d
+        elseif. do.
+          (pref,":i)=. (pref,":i)~, d
+        end.
       end.
     end.
   end.
@@ -1480,7 +1503,7 @@ end.
 )
 numdate=: 3 : 0
 if. 0= #y=. dltb y do.
-  0
+  DateTimeNull
 else.
   86400000%~ tsrep 0 0 0,~ 3{. ". ' ' (I. y e. '-:')}y
 end.
@@ -1488,7 +1511,7 @@ end.
 
 numtime=: 3 : 0"1
 if. 0= #y=. dltb y do.
-  0
+  DateTimeNull
 else.
   86400000%~ tsrep 0 (0 1 2)} 6{. ". ' ' (I. y e. '-:')}y
 end.
@@ -1496,7 +1519,7 @@ end.
 
 numdatetime=: 3 : 0"1
 if. 0= #y=. dltb y do.
-  0
+  DateTimeNull
 else.
   86400000%~ tsrep 6{. ". ' ' (I. y e. '-:')}y
 end.
@@ -1519,7 +1542,7 @@ if. -.iscl x do. _1 return. end.
 sql=. utf8 ,>x
 
 if. rc=. sqlite3_exec y;sql;0;0;ep=. ,_1 do.
-  if. {.ep do. sqlite_free {.ep end.
+  if. {.ep do. sqlite3_free {.ep end.
 end.
 rc
 )
