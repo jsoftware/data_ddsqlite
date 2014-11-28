@@ -45,7 +45,7 @@ EMPTY
 if. IFUNIX do.
   libsqlite=: unxlib 'sqlite3'
   if. 'Darwin'-:UNAME do.
-    if. fexist t=. '/opt/local/lib/libsqlie3.dylib' do.
+    if. fexist t=. '/opt/local/lib/libsqlite3.dylib' do.
       libsqlite=: t
     end.
   end.
