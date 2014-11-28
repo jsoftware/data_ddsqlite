@@ -11,7 +11,7 @@ For 32-bit windows, download from http://www.sqlite.org/download.html. Binary fo
 See wiki page http://www.jsoftware.com/jwiki/JDD for help.
 )
 
-VERSION=: '1.0.20'
+VERSION=: '1.0.21'
 
 RELEASE=: 'j802 j803'
 
