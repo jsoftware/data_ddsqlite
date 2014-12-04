@@ -405,6 +405,20 @@ case. do. 13!:8[3
 end.
 buflen, char_octlen, radix, sql_data_type, sub
 )
+install=: 3 : 0
+if. -. IFWIN do. return. end.
+require 'pacman'
+for_lib. <;._1 ' sqlite3.dll' do.
+  'rc p'=. httpget_jpacman_ 'http://www.jsoftware.com/download/', z=. 'winlib/',(IF64{::'x86';'x64'),'/',,>lib
+  if. rc do.
+    smoutput 'unable to download: ',z return.
+  end.
+  (<jpath'~bin/',>lib) 1!:2~ 1!:1 <p
+  1!:55 ::0: <p
+end.
+smoutput 'done'
+EMPTY
+)
 errret=: 3 : 0
 LERR=: ''
 ALLDM=: i. 0 0
