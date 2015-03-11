@@ -8,9 +8,9 @@ Accessing SQLite database with C API using the data driver (JDD) interface such 
 See wiki page http://www.jsoftware.com/jwiki/JDD for help.
 )
 
-VERSION=: '1.0.23'
+VERSION=: '1.0.24'
 
-RELEASE=: 'j803'
+RELEASE=: 'j803 j804'
 
 FILES=: 0 : 0
 history.txt
