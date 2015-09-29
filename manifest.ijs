@@ -5,7 +5,7 @@ CAPTION=: 'Data driver for SQLite'
 DESCRIPTION=: 0 : 0
 Accessing SQLite database with C API using the data driver (JDD) interface such as ddcon and ddfet.  Requires sqlite 3.6.0 or newer.
 
-See wiki page http://www.jsoftware.com/jwiki/JDD for help.
+See wiki page http://code.jsoftware.com/wiki/JDD for help.
 )
 
 VERSION=: '1.0.24'
