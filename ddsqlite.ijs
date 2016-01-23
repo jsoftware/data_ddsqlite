@@ -1423,7 +1423,7 @@ while.do.
       elseif. (SQL_CHAR,SQL_WCHAR,SQL_VARCHAR,SQL_WVARCHAR) e.~ i{ty do.
         (pref,":i)=. (pref,":i)~, {.a.
       elseif. (SQL_LONGVARCHAR,SQL_WLONGVARCHAR) e.~ i{ty do.
-        (pref,":i)=. (pref,":i)~, {.a.
+        (pref,":i)=. (pref,":i)~, <{.a.
       elseif. SQL_LONGVARBINARY = i{ty do.
         (pref,":i)=. (pref,":i)~, <''
       elseif. SQL_TYPE_DATE = i{ty do.
