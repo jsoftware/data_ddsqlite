@@ -1446,7 +1446,7 @@ while.do.
       elseif. (SQL_CHAR,SQL_WCHAR,SQL_VARCHAR,SQL_WVARCHAR) e.~ i{ty do.
         (pref,":i)=. (pref,":i)~, datchar i{cc
       elseif. (SQL_LONGVARCHAR,SQL_WLONGVARCHAR) e.~ i{ty do.
-        (pref,":i)=. (pref,":i)~, (<@:ucp@:}:@:datchar)`((<'')"_)@.ignorelongdata i{cc
+        (pref,":i)=. (pref,":i)~, (<@:(ucp^:UseUnicode)@:}:@:datchar)`((<'')"_)@.ignorelongdata i{cc
       elseif. SQL_LONGVARBINARY = i{ty do.
         (pref,":i)=. (pref,":i)~, datblob`((<'')"_)@.ignorelongdata i{cc
       elseif. SQL_TYPE_DATE = i{ty do.
