@@ -321,7 +321,7 @@ alltrim=: ] #~ [: -. [: (*./\. +. *./\) ' '&=
 src=: ]
 sqlbad=: 13 : '(src >{. y) e. DD_ERROR'
 sqlok=: 13 : '(src >{. y) e. DD_SUCCESS'
-iscl=: e.&(2 131072)@(3!:0) *. 1: >: [: # $
+iscl=: e.&(2 131072 262144)@(3!:0) *. 1: >: [: # $
 isua=: 0: = [: # $
 isiu=: 3!:0 e. 1 4"_
 isia=: isua *. isiu
@@ -332,7 +332,7 @@ dts=: 13 : '((#y),6) $ _1&ic , 12{."1 y'
 fmterr=: [: ; ([: ":&.> ]) ,&.> ' '"_
 badrow=: 13 : '0 e. (src ;{.&> y) e. DD_SUCCESS'
 isbx=: 3!:0 e. 32"_
-isca=: 3!:0 e. 2 131072"_
+isca=: 3!:0 e. 2 131072 262144"_
 cvt2str=: 'a'&,@":
 sqlres=: 3 : 0
 1&{::^:UseErrRet y
@@ -1108,7 +1108,7 @@ sql2=. 'select ', (}. ; (<',') ,&.> (}.tp)), ' from ', table, ' where 1=0'
 if. SQL_ERROR-: z=. y ddcoltype~ sql2 do. z return. end.
 if. (<SQL_ERROR)-: {.z do. z return. end.
 'oty ty lns'=. |: _3]\;8 13 9{("1) z=. 1&{::^:UseErrRet z
-a=. (2 131072 e.~ 3!:0)&> x1=. }.x
+a=. (2 131072 262144 e.~ 3!:0)&> x1=. }.x
 b=. (2>(#@$))&> x1
 if. 1 e. r=. a *. b do.
   x=. (,:@:,&.> (1+I.r){x) (1+I.r)}x
@@ -1239,7 +1239,7 @@ for_i. i.ncol do.
       (bnamel)=: nr$ls
       (bnamel)=: SQL_NULL_DATA (I. nul)} bnamel~
     else.
-      if. 2 131072 -.@e.~ 3!:0 da=. (i+of){::x do.
+      if. 2 131072 262144 -.@e.~ 3!:0 da=. (i+of){::x do.
         ec=. SQL_ERROR break.
       end.
       if. 2>#@$ da do. da=. ,: ,da end.
