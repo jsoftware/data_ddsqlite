@@ -10,9 +10,9 @@ See readme.txt for shared library installation.
 See wiki page http://code.jsoftware.com/wiki/JDD for help.
 )
 
-VERSION=: '1.0.29'
+VERSION=: '1.0.30'
 
-RELEASE=: 'j803 j804 j805'
+RELEASE=: 'j803 j804 j805 j806'
 
 FILES=: 0 : 0
 history.txt
