@@ -45,36 +45,15 @@ initodbcenv_jddsqlite_ 0
 EMPTY
 )
 3 : 0''
-fnd=. 0
-if. UNAME-:'Android' do.
-  arch=. LF-.~ 2!:0'getprop ro.product.cpu.abi'
-  t=. (jpath'~bin/../libexec/android-libs/',arch,'/libjsqlite3.so')
-  fnd=. 0-.@-:(t, ' sqlite3_extversion > ',(IFWIN#'+'),' x')&cd ::0: ''
-else.
-  if. -. ((<UNAME) e.'Darwin';'Linux')>IF64+.IFRASPI do.
-    ext=. (('Darwin';'Linux') i. <UNAME) pick ;:'dylib so dll'
-    t=. 'libjsqlite3',((-.IF64+.IFRASPI)#'_32'),'.',ext
-    if. 0-.@-:(t, ' sqlite3_extversion > ',(IFWIN#'+'),' x')&cd ::0: '' do.
-      fnd=. 1
-    else.
-      t=. jpath '~addons/data/sqlite/lib/libjsqlite3',((-.IF64+.IFRASPI)#'_32'),'.',ext
-      fnd=. 0-.@-:(t, ' sqlite3_extversion > ',(IFWIN#'+'),' x')&cd ::0: ''
+if. IFUNIX do.
+  libsqlite=: unxlib 'sqlite3'
+  if. 'Darwin'-:UNAME do.
+    if. fexist t=. '/opt/local/lib/libsqlite3.dylib' do.
+      libsqlite=: t
     end.
   end.
-end.
-if. fnd do.
-  libsqlite=: t
 else.
-  if. IFUNIX do.
-    libsqlite=: unxlib 'sqlite3'
-    if. 'Darwin'-:UNAME do.
-      if. fexist t=. '/opt/local/lib/libsqlite3.dylib' do.
-        libsqlite=: t
-      end.
-    end.
-  else.
-    libsqlite=: 'sqlite3.dll'
-  end.
+  libsqlite=: 'sqlite3.dll'
 end.
 i.0 0
 )
@@ -181,12 +160,8 @@ sqlite3_shutdown=: (libsqlite, ' sqlite3_shutdown > ',(IFWIN#'+'),' i') &cd
 sqlite3_step=: (libsqlite, ' sqlite3_step > ',(IFWIN#'+'),' i x' ) &cd
 sqlite3_table_column_metadata=: (libsqlite, ' sqlite3_table_column_metadata > ',(IFWIN#'+'),' i x *c *c *c *x *x *i *i *i' ) &cd
 sqlite3_total_changes=: (libsqlite, ' sqlite3_total_changes > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_extversion=: (libsqlite, ' sqlite3_extversion > ',(IFWIN#'+'),' x') &cd
-sqlite3_free_values=: (libsqlite, ' sqlite3_free_values > ',(IFWIN#'+'),' i *') &cd
-sqlite3_read_values=: (libsqlite, ' sqlite3_read_values ',(IFWIN#'+'),' i x *') &cd
 3 : 0''
-has_sqlite3_extversion=: 0 -.@-: sqlite3_extversion ::0: ''
-if. (IFIOS +. UNAME-:'Android')>has_sqlite3_extversion do.
+if. IFIOS +. UNAME-:'Android' do.
   sqlite3_column_database_name=: 0:
   sqlite3_column_origin_name=: 0:
   sqlite3_column_table_name=: 0:
@@ -1407,31 +1382,6 @@ assert. 15={:$x
 oty=. ; 8 {"1 x
 ln=. ; 9 {"1 x
 ty=. ; 13 {"1 x
-
-if. has_sqlite3_extversion *. _1=r do.
-  data=. sqlread0 sh
-  if. 0<{.ttally data do.
-    if. ignorelongdata *. 1 e. ty e. SQL_LONGVARCHAR,SQL_WLONGVARCHAR,SQL_LONGVARBINARY do.
-      bx=. I. ty e. SQL_LONGVARCHAR,SQL_WLONGVARCHAR,SQL_LONGVARBINARY
-      data=. (<({.ttally data)#<'') bx}data
-    end.
-    if. UseUnicode do.
-      for_i. I.(SQL_CHAR,SQL_WCHAR,SQL_VARCHAR,SQL_WVARCHAR,SQL_LONGVARCHAR,SQL_WLONGVARCHAR) e.~ ty do.
-        data=. (< ucp&.> i{::data) i}data
-      end.
-    end.
-    if. UseDayNo do.
-      for_i. I.(SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP) e.~ ty do.
-        data=. (< ,. numdate`numtime`numdatetime@.((SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP)i.i{ty)&.> i{::data) i}data
-      end.
-    end.
-  end.
-  if. UseErrRet do.
-    (<<<0),data return.
-  else.
-    data return.
-  end.
-end.
 cc=. sh,.i.#ty
 
 dat=. 0$<''
@@ -1599,38 +1549,6 @@ if. 0= #y=. dltb y do.
 else.
   86400000%~ tsrep 6{. ". ' ' (I. y e. '-:')}y
 end.
-)
-sqlread0=: 3 : 0
-sh=. y
-'rc j res'=. sqlite3_read_values sh;,2
-assert. rc = SQLITE_DONE
-SZI=. IF64{4 8
-'buf typ nms len rws cls'=. memr res, 0 6 4
-colnames=. <;._2 memr nms,0,len
-pointers=. memr buf,0,cls,4
-types=. memr typ,0,cls,4
-data=. ''
-for_p. pointers do.
-  select. p_index{types
-  case. 1 do.
-    val=. memr p,0,rws,4
-  case. 2 do.
-    val=. memr p,0,rws,8
-  case. 3 do.
-    len=. memr p, 0 1 4
-    val=. <;._2 memr p,SZI,len-SZI
-  case. 4 do.
-    len=. memr p, 0 1 4
-    cnt=. memr p,SZI,rws,4
-    pos=. SZI * rws+1
-    dat=. memr p,pos,len-pos
-    msk=. 1 (0,+/\}:cnt)} (#dat)$0
-    val=. msk <;.1 dat
-  end.
-  data=. data,<val
-end.
-sqlite3_free_values <res
-data
 )
 createdb=: 3 : 0
 if. -.iscl y do. _2 return. end.
