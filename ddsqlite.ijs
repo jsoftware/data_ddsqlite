@@ -1,18 +1,21 @@
 
 coclass 'jddsqlite'
+ifa_z_=: <@(>"1)@|:
+afi_z_=: |:@:(<"_1@>)
+ttally_z_=: *@# * #@>@{.
 
 DateTimeNull=: _1
 NumericNull=: _
-InitDone=: 0
+InitDone=: (InitDone_jddsqlite_)^:(0=4!:0<'InitDone_jddsqlite_') 0
 UseErrRet=: 0
 UseDayNo=: 0
 UseUnicode=: 0
 
 create=: 3 : 0
-if. 0=InitDone do.
+if. 0=InitDone_jddsqlite_ do.
   sqlite3_initialize''
   sqlite3_enable_shared_cache 1
-  Init_jddsqlite_=: 1
+  InitDone_jddsqlite_=: 1
 end.
 initodbcenv 0
 ''
