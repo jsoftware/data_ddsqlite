@@ -6,7 +6,7 @@ ttally_z_=: *@# * #@>@{.
 
 DateTimeNull=: _1
 NumericNull=: _
-InitDone=: (InitDone_jddsqlite_)^:(0=4!:0<'InitDone_jddsqlite_') 0
+InitDone=: (InitDone_jddsqlite_"_)^:(0=4!:0<'InitDone_jddsqlite_') 0
 UseErrRet=: 0
 UseDayNo=: 0
 UseUnicode=: 0
