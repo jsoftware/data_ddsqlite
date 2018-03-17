@@ -1534,7 +1534,7 @@ numdate=: 3 : 0
 if. 0= #y=. dltb y do.
   DateTimeNull
 else.
-  86400000%~ tsrep 0 0 0,~ 3{. ". ' ' (I. y e. '-:')}y
+  86400000%~ tsrep 0 0 0,~ 3{. ". ' 0123456789' ([-.-.)~ ' ' (I. y e. '-:+TZ')}y
 end.
 )
 
@@ -1542,7 +1542,7 @@ numtime=: 3 : 0"1
 if. 0= #y=. dltb y do.
   DateTimeNull
 else.
-  86400000%~ tsrep 0 (0 1 2)} 6{. ". ' ' (I. y e. '-:')}y
+  86400000%~ tsrep 0 (0 1 2)} 6{. ". ' 0123456789' ([-.-.)~ ' ' (I. y e. '-:+TZ')}y
 end.
 )
 
@@ -1550,7 +1550,7 @@ numdatetime=: 3 : 0"1
 if. 0= #y=. dltb y do.
   DateTimeNull
 else.
-  86400000%~ tsrep 6{. ". ' ' (I. y e. '-:')}y
+  86400000%~ tsrep 6{. ". ' 0123456789' ([-.-.)~ ' ' (I. y e. '-:+TZ')}y
 end.
 )
 createdb=: 3 : 0
