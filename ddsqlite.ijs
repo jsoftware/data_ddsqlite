@@ -1233,9 +1233,9 @@ for_i. i.ncol do.
       end.
       nul=. DateTimeNull= da=. ,da
       da=. isotimestamp 1 tsrep <.86400000* 0 (I.nul)}da
-      if. SQL_TYPE_TIMESTAMP= t do. (bname)=: 23{."1 da
-      elseif. SQL_TYPE_DATE= t do. (bname)=: 10{."1 da
-      elseif. SQL_TYPE_TIME= t do. (bname)=: 11}."1 da
+      if. SQL_TYPE_TIMESTAMP= t do. (bname)=: da=. 23{."1 da
+      elseif. SQL_TYPE_DATE= t do. (bname)=: da=. 10{."1 da
+      elseif. SQL_TYPE_TIME= t do. (bname)=: da=. 11}."1 da
       end.
       lns=. (ls=. {:@$ da) i}lns
       nr=. #da
@@ -1246,8 +1246,8 @@ for_i. i.ncol do.
         ec=. SQL_ERROR break.
       end.
       if. 2>#@$ da do. da=. ,: ,da end.
-      if. SQL_TYPE_TIMESTAMP= t do. (bname)=: 23{."1 da
-      elseif. SQL_TYPE_DATE= t do. (bname)=: 10{."1 da
+      if. SQL_TYPE_TIMESTAMP= t do. (bname)=: da=. 23{."1 da
+      elseif. SQL_TYPE_DATE= t do. (bname)=: da=. 10{."1 da
       elseif. SQL_TYPE_TIME= t do. (bname)=: da
       end.
       lns=. (ls=. {:@$ da) i}lns
@@ -1296,7 +1296,7 @@ while. k<rows do.
           ec=. sqlite3_bind_zeroblob sh;(>:i);_1
         end.
       case. SQL_TYPE_DATE;SQL_TYPE_TIME;SQL_TYPE_TIMESTAMP do.
-        ec=. sqlite3_bind_text sh;(>:i);(utf8 ,>k{bname~);_1;SQLITE_TRANSIENT
+        ec=. sqlite3_bind_text sh;(>:i);(utf8 ,>k{bname~);klen;SQLITE_TRANSIENT
       case. do.
         assert. 0
       end.
