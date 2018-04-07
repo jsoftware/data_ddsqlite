@@ -10,7 +10,7 @@ See readme.txt for shared library installation.
 See wiki page http://code.jsoftware.com/wiki/JDD for help.
 )
 
-VERSION=: '1.0.37'
+VERSION=: '1.0.38'
 
 RELEASE=: 'j803 j804 j805 j806 j807'
 

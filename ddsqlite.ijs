@@ -143,7 +143,7 @@ sqlite3_db_handle=: (libsqlite, ' sqlite3_db_handle > ',(IFWIN#'+'),' x x' ) &cd
 sqlite3_enable_shared_cache=: (libsqlite, ' sqlite3_enable_shared_cache > ',(IFWIN#'+'),' i i' ) &cd
 sqlite3_errcode=: (libsqlite, ' sqlite3_errcode > ',(IFWIN#'+'),' i x' ) &cd
 sqlite3_errmsg=: (libsqlite, ' sqlite3_errmsg > ',(IFWIN#'+'),' x x' ) &cd
-sqlite3_exec=: (libsqlite, ' sqlite3_exec > ',(IFWIN#'+'),' i x *c x x *x' ) &cd
+sqlite3_exec=: (libsqlite, ' sqlite3_exec   ',(IFWIN#'+'),' i x *c x x *x' ) &cd
 sqlite3_extended_result_codes=: (libsqlite, ' sqlite3_extended_result_codes > ',(IFWIN#'+'),' i x i' ) &cd
 sqlite3_finalize=: (libsqlite, ' sqlite3_finalize > ',(IFWIN#'+'),' i x' ) &cd
 sqlite3_free=: (libsqlite, ' sqlite3_free > ',(IFWIN#'+'),' i x' ) &cd
@@ -154,14 +154,14 @@ sqlite3_initialize=: (libsqlite, ' sqlite3_initialize > ',(IFWIN#'+'),' i') &cd
 sqlite3_last_insert_rowid=: (libsqlite, ' sqlite3_last_insert_rowid > ',(IFWIN#'+'),' i x' ) &cd
 sqlite3_libversion=: (libsqlite, ' sqlite3_libversion > ',(IFWIN#'+'),' x' ) &cd
 sqlite3_libversion_number=: (libsqlite, ' sqlite3_libversion_number > ',(IFWIN#'+'),' i' ) &cd
-sqlite3_open=: (libsqlite, ' sqlite3_open > ',(IFWIN#'+'),' i *c *x' ) &cd
-sqlite3_open_v2=: (libsqlite, ' sqlite3_open_v2 > ',(IFWIN#'+'),' i *c *x i *c' ) &cd
-sqlite3_prepare=: (libsqlite, ' sqlite3_prepare > ',(IFWIN#'+'),' i x *c i *x *x' ) &cd
-sqlite3_prepare_v2=: (libsqlite, ' sqlite3_prepare_v2 > ',(IFWIN#'+'),' i x *c i *x *x' ) &cd
+sqlite3_open=: (libsqlite, ' sqlite3_open   ',(IFWIN#'+'),' i *c *x' ) &cd
+sqlite3_open_v2=: (libsqlite, ' sqlite3_open_v2   ',(IFWIN#'+'),' i *c *x i *c' ) &cd
+sqlite3_prepare=: (libsqlite, ' sqlite3_prepare   ',(IFWIN#'+'),' i x *c i *x *x' ) &cd
+sqlite3_prepare_v2=: (libsqlite, ' sqlite3_prepare_v2   ',(IFWIN#'+'),' i x *c i *x *x' ) &cd
 sqlite3_reset=: (libsqlite, ' sqlite3_reset > ',(IFWIN#'+'),' i x' ) &cd
 sqlite3_shutdown=: (libsqlite, ' sqlite3_shutdown > ',(IFWIN#'+'),' i') &cd
 sqlite3_step=: (libsqlite, ' sqlite3_step > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_table_column_metadata=: (libsqlite, ' sqlite3_table_column_metadata > ',(IFWIN#'+'),' i x *c *c *c *x *x *i *i *i' ) &cd
+sqlite3_table_column_metadata=: (libsqlite, ' sqlite3_table_column_metadata   ',(IFWIN#'+'),' i x *c *c *c *x *x *i *i *i' ) &cd
 sqlite3_total_changes=: (libsqlite, ' sqlite3_total_changes > ',(IFWIN#'+'),' i x' ) &cd
 3 : 0''
 if. IFIOS +. UNAME-:'Android' do.
@@ -488,7 +488,8 @@ if. p=. sqlite3_column_origin_name y do. org_column=. memr p, 0 _1 else. org_col
 org_table=. table
 if. #org_column do.
   datatype=. ,_1 [ collate=. ,_1 [ notnull=. ,_1 [ primkey=. ,_1 [ autoinc=. ,_1
-  if. SQLITE_OK= ec=. sqlite3_table_column_metadata ch;database;table;org_column;datatype;collate;notnull;primkey;autoinc do.
+  if. SQLITE_OK= ec=. >@{. cdrc=. sqlite3_table_column_metadata ch;database;table;org_column;datatype;collate;notnull;primkey;autoinc do.
+    'ch database table org_column datatype collate notnull primkey autoinc'=. }.cdrc
     typenamex=. memr datatype,0 _1 [ nullable=. -.{.notnull
     'datatype typename length'=. parse_sqlite_typename typenamex
     'buflen char_octlen radix sqlcoltype sub'=. guess_sqlite_buffer datatype; length
@@ -605,7 +606,8 @@ if. SQLITE_OK = >@{. z=. ('select * from ', x,' where 1=0') preparestmt y do.
     if. p=. sqlite3_column_origin_name sh,i do.
       column=. memr p, 0 _1
       datatype=. ,_1 [ collate=. ,_1 [ notnull=. ,_1 [ primkey=. ,_1 [ autoinc=. ,_1
-      if. SQLITE_OK= ec=. sqlite3_table_column_metadata w;db;tb;column;datatype;collate;notnull;primkey;autoinc do.
+      if. SQLITE_OK= ec=. >@{. cdrc=. sqlite3_table_column_metadata w;db;tb;column;datatype;collate;notnull;primkey;autoinc do.
+        'w db tb column datatype collate notnull primkey autoinc'=. }.cdrc
         typenamex=. memr datatype,0 _1 [ nullable=. -.{.notnull
         'data_type type_name col_size'=. parse_sqlite_typename typenamex
         'buflen char_octlen radix sql_data_type sub'=. guess_sqlite_buffer data_type; col_size
@@ -657,9 +659,10 @@ if. keyname e.~ <'timeout' do.
 end.
 
 handle=. ,_1
-if. SQLITE_OK~: sqlite3_open_v2 (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_FULLMUTEX+SQLITE_OPEN_SHAREDCACHE+(nocreate{SQLITE_OPEN_CREATE,0));<<0 do.
+if. SQLITE_OK~: >@{. cdrc=. sqlite3_open_v2 (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_FULLMUTEX+SQLITE_OPEN_SHAREDCACHE+(nocreate{SQLITE_OPEN_CREATE,0));<<0 do.
   errret ISI19 return.
 end.
+handle=. 2{::cdrc
 sqlite3_extended_result_codes handle, 1
 sqlite3_busy_timeout handle, timeout
 HDBC=: {.handle
@@ -685,7 +688,8 @@ ret_DD_OK DD_OK
 )
 preparestmt=: 4 : 0
 stmt=. ,_1 [ tail=. ,_1
-if. SQLITE_OK = rc=. sqlite3_prepare_v2 ({.y);(bs x),stmt;tail do.
+if. SQLITE_OK = rc=. >@{. cdrc=. sqlite3_prepare_v2 ({.y);(bs x),stmt;tail do.
+  'stmt tail'=. 4 5{cdrc
   if. ({.tail) e. 0 _1 do.
     rc;({.stmt);''
   else.
@@ -709,7 +713,8 @@ transact=: 4 : 0
 assert. x e. SQL_COMMIT,SQL_ROLLBACK,SQL_BEGIN
 COMRBK=. x{::'COMMIT';'ROLLBACK';'BEGIN'
 st=. ,_1
-if. SQLITE_OK= r=. sqlite3_prepare_v2 y;COMRBK;(#COMRBK);st;<<0 do.
+if. SQLITE_OK= r=. >@{. cdrc=. sqlite3_prepare_v2 y;COMRBK;(#COMRBK);st;<<0 do.
+  st=. 4{::cdrc
   r=. sqlite3_step {.st
   r1=. sqlite3_finalize {.st
   if. (SQLITE_OK,SQLITE_DONE) e.~ r do.
@@ -1558,10 +1563,10 @@ if. -.iscl y do. _2 return. end.
 dbq=. utf8 ,>y
 if. fexist dbq do. _1 return. end.
 handle=. ,_1
-if. SQLITE_OK~: rc=. sqlite3_open_v2 (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_CREATE);<<0 do.
+if. SQLITE_OK~: rc=. >@{. cdrc=. sqlite3_open_v2 (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_CREATE);<<0 do.
   rc
 else.
-  0 [ sqlite3_close {.handle
+  0 [ sqlite3_close {.handle=. 2{::cdrc
 end.
 )
 exec=: 4 : 0
@@ -1570,7 +1575,8 @@ if. -. y e. CHALL do. _1 return. end.
 if. -.iscl x do. _1 return. end.
 sql=. utf8 ,>x
 
-if. rc=. sqlite3_exec y;sql;0;0;ep=. ,_1 do.
+if. rc=. >@{. cdrc=. sqlite3_exec y;sql;0;0;ep=. ,_1 do.
+  ep=. 5{::cdrc
   if. {.ep do. sqlite3_free {.ep end.
 end.
 rc
