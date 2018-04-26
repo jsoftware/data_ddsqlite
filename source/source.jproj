@@ -1,0 +1,15 @@
+NB. project: ~Addons/data/ddsqlite/source/source
+NB.
+NB. defines list of source files.
+NB. path defaults to project directory.
+
+init.ijs
+api.ijs
+defs.ijs
+types.ijs
+util.ijs
+ddfns.ijs
+ddins.ijs
+getdata.ijs
+admin.ijs
+accessor.ijs
