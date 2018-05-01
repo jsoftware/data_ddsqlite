@@ -94,6 +94,31 @@ oty=. ; 8 {"1 x
 ln=. ; 9 {"1 x
 ty=. ; 13 {"1 x
 
+if. has_sqlite3_extversion *. (_1=r) do.
+  data=. sqlread0 sh
+  if. 0<{.ttally data do.
+    if. ignorelongdata *. 1 e. ty e. SQL_LONGVARCHAR,SQL_WLONGVARCHAR,SQL_LONGVARBINARY do.
+      bx=. I. ty e. SQL_LONGVARCHAR,SQL_WLONGVARCHAR,SQL_LONGVARBINARY
+      data=. (<({.ttally data)#<'') bx}data
+    end.
+    if. UseUnicode do.
+      for_i. I.(SQL_CHAR,SQL_WCHAR,SQL_WVARCHAR,SQL_WLONGVARCHAR) e.~ ty do.
+        data=. (< ucp&.> i{::data) i}data
+      end.
+    end.
+    if. UseDayNo do.
+      for_i. I.(SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP) e.~ ty do.
+        data=. (< ,. numdate`numtime`numdatetime@.((SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP)i.i{ty)&.> i{::data) i}data
+      end.
+    end.
+  end.
+  if. UseErrRet do.
+    (<<<0),data return.
+  else.
+    data return.
+  end.
+end.
+
 NB. columns numbers and stmt handles
 cc=. sh,.i.#ty
 
@@ -268,3 +293,48 @@ else.
   86400000%~ tsrep 6{. ". ' 0123456789' ([-.-.)~ ' ' (I. y e. '-:+TZ')}y
 end.
 )
+
+NB. =========================================================
+NB. read column data
+sqlread0=: 3 : 0
+sh=. y
+'rc j res'=. sqlite3_read_values sh;,2
+assert. rc = SQLITE_DONE
+SZI=. IF64{4 8
+'buf typ nms len rws cls'=. memr res, 0 6 4
+colnames=. <;._2 memr nms,0,len
+pointers=. memr buf,0,cls,4
+types=. memr typ,0,cls,4
+data=. ''
+NB. types: 1 int 2 float 3 text 4 blob
+for_p. pointers do.
+  select. p_index{types
+  case. 1 do.
+    val=. memr p,0,rws,4
+  case. 2 do.
+    val=. memr p,0,rws,8
+  case. 3 do.
+    len=. memr p, 0 1 4
+    val=. <;._2 memr p,SZI,len-SZI
+  case. 4 do.
+    cnt=. memr p,SZI,rws,4
+    pos=. SZI * rws+1
+    dat=. memr p,pos,+/cnt
+    if. 0=#dat do.
+      val=. (#cnt)#<''
+    else.
+      if. 0 e. cnt do.
+        msk=. 1 (0,+/\}:cnt-.0)} (#dat)$0
+        val=. (cnt>0) #^:_1 msk <;.1 dat
+      else.
+        msk=. 1 (0,+/\}:cnt)} (#dat)$0
+        val=. msk <;.1 dat
+      end.
+    end.
+  end.
+  data=. data,<val
+end.
+sqlite3_free_values <res
+data
+)
+

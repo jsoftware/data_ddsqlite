@@ -1,15 +1,40 @@
 NB. api
 
 3 : 0''
-if. IFUNIX do.
-  libsqlite=: unxlib 'sqlite3'
-  if. 'Darwin'-:UNAME do.
-    if. fexist t=. '/opt/local/lib/libsqlite3.dylib' do.
-      libsqlite=: t
+fnd=. 0
+if. -. (USEJSQLITE"_)^:(0=4!:0<'USEJSQLITE') 0 do.
+NB. default not using libjsqlite3
+elseif. UNAME-:'Android' do.
+  arch=. LF-.~ 2!:0'getprop ro.product.cpu.abi'
+  t=. (jpath'~bin/../libexec/android-libs/',arch,'/libjsqlite3.so')
+  fnd=. 0-.@-:(t, ' sqlite3_extversion > ',(IFWIN#'+'),' x')&cd ::0: ''
+elseif. do.
+NB. no 32-bit libjsqlite3 binary for Darwin/Linux except raspberry
+  if. -. ((<UNAME) e.'Darwin';'Linux')>IF64+.IFRASPI do.
+    ext=. (('Darwin';'Linux') i. <UNAME) pick ;:'dylib so dll'
+    t=. 'libjsqlite3',((-.IF64+.IFRASPI)#'_32'),'.',ext
+    if. 0-.@-:(t, ' sqlite3_extversion > ',(IFWIN#'+'),' x')&cd ::0: '' do.
+      fnd=. 1
+    else.
+NB. retry in addons folder
+      t=. jpath '~addons/data/sqlite/lib/libjsqlite3',((-.IF64+.IFRASPI)#'_32'),'.',ext
+      fnd=. 0-.@-:(t, ' sqlite3_extversion > ',(IFWIN#'+'),' x')&cd ::0: ''
     end.
   end.
+end.
+if. fnd do.
+  libsqlite=: t
 else.
-  libsqlite=: 'sqlite3.dll'
+  if. IFUNIX do.
+    libsqlite=: unxlib 'sqlite3'
+    if. 'Darwin'-:UNAME do.
+      if. fexist t=. '/opt/local/lib/libsqlite3.dylib' do.
+        libsqlite=: t
+      end.
+    end.
+  else.
+    libsqlite=: 'sqlite3.dll'
+  end.
 end.
 i.0 0
 )
@@ -130,9 +155,16 @@ sqlite3_step=: (libsqlite, ' sqlite3_step > ',(IFWIN#'+'),' i x' ) &cd
 sqlite3_table_column_metadata=: (libsqlite, ' sqlite3_table_column_metadata   ',(IFWIN#'+'),' i x *c *c *c *x *x *i *i *i' ) &cd
 sqlite3_total_changes=: (libsqlite, ' sqlite3_total_changes > ',(IFWIN#'+'),' i x' ) &cd
 
-NB. android libsqlite.so did not compiled with the SQLITE_ENABLE_COLUMN_METADATA
+NB. =========================================================
+NB. sqlite extensions:
+sqlite3_extversion=: (libsqlite, ' sqlite3_extversion > ',(IFWIN#'+'),' x') &cd
+sqlite3_free_values=: (libsqlite, ' sqlite3_free_values > ',(IFWIN#'+'),' i *') &cd
+sqlite3_read_values=: (libsqlite, ' sqlite3_read_values ',(IFWIN#'+'),' i x *') &cd
+
+NB. stock android libsqlite.so did not compiled with the SQLITE_ENABLE_COLUMN_METADATA
 3 : 0''
-if. IFIOS +. UNAME-:'Android' do.
+has_sqlite3_extversion=: 0 -.@-: sqlite3_extversion ::0: ''
+if. (IFIOS +. UNAME-:'Android')>has_sqlite3_extversion do.
   sqlite3_column_database_name=: 0:
   sqlite3_column_origin_name=: 0:
   sqlite3_column_table_name=: 0:

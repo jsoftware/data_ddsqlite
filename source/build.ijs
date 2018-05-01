@@ -1,6 +1,6 @@
 NB. build
 
-writesourcex_jp_ '~Addons/data/ddsqlite/source/source';'~Addons/data/ddsqlite/ddsqlite.ijs'
+writesourcex_jp_ '~Addons/data/ddsqlite/source';'~Addons/data/ddsqlite/ddsqlite.ijs'
 
 (jpath '~addons/data/ddsqlite/ddsqlite.ijs') (fcopynew ::0:) jpath '~Addons/data/ddsqlite/ddsqlite.ijs'
 
