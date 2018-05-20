@@ -9,17 +9,14 @@ elseif. UNAME-:'Android' do.
   t=. (jpath'~bin/../libexec/android-libs/',arch,'/libjsqlite3.so')
   fnd=. 0-.@-:(t, ' sqlite3_extversion > ',(IFWIN#'+'),' x')&cd ::0: ''
 elseif. do.
-NB. no 32-bit libjsqlite3 binary for Darwin/Linux except raspberry
-  if. -. ((<UNAME) e.'Darwin';'Linux')>IF64+.IFRASPI do.
-    ext=. (('Darwin';'Linux') i. <UNAME) pick ;:'dylib so dll'
-    t=. 'libjsqlite3',((-.IF64+.IFRASPI)#'_32'),'.',ext
-    if. 0-.@-:(t, ' sqlite3_extversion > ',(IFWIN#'+'),' x')&cd ::0: '' do.
-      fnd=. 1
-    else.
+  ext=. (('Darwin';'Linux') i. <UNAME) pick ;:'dylib so dll'
+  t=. 'libjsqlite3',((-.IF64)#'_32'),'.',ext
+  if. 0-.@-:(t, ' sqlite3_extversion > ',(IFWIN#'+'),' x')&cd ::0: '' do.
+    fnd=. 1
+  else.
 NB. retry in addons folder
-      t=. jpath '~addons/data/sqlite/lib/libjsqlite3',((-.IF64+.IFRASPI)#'_32'),'.',ext
-      fnd=. 0-.@-:(t, ' sqlite3_extversion > ',(IFWIN#'+'),' x')&cd ::0: ''
-    end.
+    t=. jpath '~addons/data/sqlite/lib/libjsqlite3',((-.IF64)#'_32'),'.',ext
+    fnd=. 0-.@-:(t, ' sqlite3_extversion > ',(IFWIN#'+'),' x')&cd ::0: ''
   end.
 end.
 if. fnd do.
@@ -105,65 +102,73 @@ SQLITE_STATIC=: 0
 SQLITE_TRANSIENT=: _1
 
 NB. =========================================================
+NB. standard sqlite:
+lib=. '"',libsqlite,'"'
 
-sqlite3_bind_blob=: (libsqlite, ' sqlite3_bind_blob > ',(IFWIN#'+'),' i x i *c i x' ) &cd
-sqlite3_bind_double=: (libsqlite, ' sqlite3_bind_double > ',(IFWIN#'+'),' i x i d' ) &cd
-sqlite3_bind_int64=: (libsqlite, ' sqlite3_bind_int64 > ',(IFWIN#'+'),' i x i x' ) &cd
-sqlite3_bind_int=: (libsqlite, ' sqlite3_bind_int > ',(IFWIN#'+'),' i x i i' ) &cd
-sqlite3_bind_null=: (libsqlite, ' sqlite3_bind_null > ',(IFWIN#'+'),' i x i' ) &cd
-sqlite3_bind_parameter_count=: (libsqlite, ' sqlite3_bind_parameter_count > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_bind_text=: (libsqlite, ' sqlite3_bind_text > ',(IFWIN#'+'),' i x i *c i x' ) &cd
-sqlite3_bind_zeroblob=: (libsqlite, ' sqlite3_bind_zeroblob > ',(IFWIN#'+'),' i x i i' ) &cd
-sqlite3_busy_timeout=: (libsqlite, ' sqlite3_busy_timeout > ',(IFWIN#'+'),' i x i' ) &cd
-sqlite3_changes=: (libsqlite, ' sqlite3_changes > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_close=: (libsqlite, ' sqlite3_close > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_column_blob=: (libsqlite, ' sqlite3_column_blob > ',(IFWIN#'+'),' x x i' ) &cd
-sqlite3_column_bytes=: (libsqlite, ' sqlite3_column_bytes > ',(IFWIN#'+'),' i x i' ) &cd
-sqlite3_column_count=: (libsqlite, ' sqlite3_column_count > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_column_database_name=: (libsqlite, ' sqlite3_column_database_name > ',(IFWIN#'+'),' x x i' ) &cd
-sqlite3_column_decltype=: (libsqlite, ' sqlite3_column_decltype > ',(IFWIN#'+'),' x x i' ) &cd
-sqlite3_column_double=: (libsqlite, ' sqlite3_column_double > ',(IFWIN#'+'),' d x i' ) &cd
-sqlite3_column_int64=: (libsqlite, ' sqlite3_column_int64 > ',(IFWIN#'+'),' x x i' ) &cd
-sqlite3_column_int=: (libsqlite, ' sqlite3_column_int > ',(IFWIN#'+'),' i x i' ) &cd
-sqlite3_column_name=: (libsqlite, ' sqlite3_column_name > ',(IFWIN#'+'),' x x i' ) &cd
-sqlite3_column_origin_name=: (libsqlite, ' sqlite3_column_origin_name > ',(IFWIN#'+'),' x x i' ) &cd
-sqlite3_column_table_name=: (libsqlite, ' sqlite3_column_table_name > ',(IFWIN#'+'),' x x i' ) &cd
-sqlite3_column_text=: (libsqlite, ' sqlite3_column_text > ',(IFWIN#'+'),' x x i' ) &cd
-sqlite3_column_type=: (libsqlite, ' sqlite3_column_type > ',(IFWIN#'+'),' i x i' ) &cd
-sqlite3_db_handle=: (libsqlite, ' sqlite3_db_handle > ',(IFWIN#'+'),' x x' ) &cd
-sqlite3_enable_shared_cache=: (libsqlite, ' sqlite3_enable_shared_cache > ',(IFWIN#'+'),' i i' ) &cd
-sqlite3_errcode=: (libsqlite, ' sqlite3_errcode > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_errmsg=: (libsqlite, ' sqlite3_errmsg > ',(IFWIN#'+'),' x x' ) &cd
-sqlite3_exec=: (libsqlite, ' sqlite3_exec   ',(IFWIN#'+'),' i x *c x x *x' ) &cd
-sqlite3_extended_result_codes=: (libsqlite, ' sqlite3_extended_result_codes > ',(IFWIN#'+'),' i x i' ) &cd
-sqlite3_finalize=: (libsqlite, ' sqlite3_finalize > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_free=: (libsqlite, ' sqlite3_free > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_free_table=: (libsqlite, ' sqlite3_free_table > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_get_autocommit=: (libsqlite, ' sqlite3_get_autocommit > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_get_table=: (libsqlite, ' sqlite3_get_table > ',(IFWIN#'+'),' i x *c *x *i *i *x' ) &cd
-sqlite3_initialize=: (libsqlite, ' sqlite3_initialize > ',(IFWIN#'+'),' i') &cd
-sqlite3_last_insert_rowid=: (libsqlite, ' sqlite3_last_insert_rowid > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_libversion=: (libsqlite, ' sqlite3_libversion > ',(IFWIN#'+'),' x' ) &cd
-sqlite3_libversion_number=: (libsqlite, ' sqlite3_libversion_number > ',(IFWIN#'+'),' i' ) &cd
-sqlite3_open=: (libsqlite, ' sqlite3_open   ',(IFWIN#'+'),' i *c *x' ) &cd
-sqlite3_open_v2=: (libsqlite, ' sqlite3_open_v2   ',(IFWIN#'+'),' i *c *x i *c' ) &cd
-sqlite3_prepare=: (libsqlite, ' sqlite3_prepare   ',(IFWIN#'+'),' i x *c i *x *x' ) &cd
-sqlite3_prepare_v2=: (libsqlite, ' sqlite3_prepare_v2   ',(IFWIN#'+'),' i x *c i *x *x' ) &cd
-sqlite3_reset=: (libsqlite, ' sqlite3_reset > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_shutdown=: (libsqlite, ' sqlite3_shutdown > ',(IFWIN#'+'),' i') &cd
-sqlite3_step=: (libsqlite, ' sqlite3_step > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_table_column_metadata=: (libsqlite, ' sqlite3_table_column_metadata   ',(IFWIN#'+'),' i x *c *c *c *x *x *i *i *i' ) &cd
-sqlite3_total_changes=: (libsqlite, ' sqlite3_total_changes > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_bind_blob=: (lib, ' sqlite3_bind_blob > ',(IFWIN#'+'),' i x i *c i x' ) &cd
+sqlite3_bind_double=: (lib, ' sqlite3_bind_double > ',(IFWIN#'+'),' i x i d' ) &cd
+sqlite3_bind_int64=: (lib, ' sqlite3_bind_int64 > ',(IFWIN#'+'),' i x i x' ) &cd
+sqlite3_bind_int=: (lib, ' sqlite3_bind_int > ',(IFWIN#'+'),' i x i i' ) &cd
+sqlite3_bind_null=: (lib, ' sqlite3_bind_null > ',(IFWIN#'+'),' i x i' ) &cd
+sqlite3_bind_parameter_count=: (lib, ' sqlite3_bind_parameter_count > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_bind_text=: (lib, ' sqlite3_bind_text > ',(IFWIN#'+'),' i x i *c i x' ) &cd
+sqlite3_bind_zeroblob=: (lib, ' sqlite3_bind_zeroblob > ',(IFWIN#'+'),' i x i i' ) &cd
+sqlite3_busy_timeout=: (lib, ' sqlite3_busy_timeout > ',(IFWIN#'+'),' i x i' ) &cd
+sqlite3_changes=: (lib, ' sqlite3_changes > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_close=: (lib, ' sqlite3_close > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_column_blob=: (lib, ' sqlite3_column_blob > ',(IFWIN#'+'),' x x i' ) &cd
+sqlite3_column_bytes=: (lib, ' sqlite3_column_bytes > ',(IFWIN#'+'),' i x i' ) &cd
+sqlite3_column_count=: (lib, ' sqlite3_column_count > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_column_database_name=: (lib, ' sqlite3_column_database_name > ',(IFWIN#'+'),' x x i' ) &cd
+sqlite3_column_decltype=: (lib, ' sqlite3_column_decltype > ',(IFWIN#'+'),' x x i' ) &cd
+sqlite3_column_double=: (lib, ' sqlite3_column_double > ',(IFWIN#'+'),' d x i' ) &cd
+sqlite3_column_int64=: (lib, ' sqlite3_column_int64 > ',(IFWIN#'+'),' x x i' ) &cd
+sqlite3_column_int=: (lib, ' sqlite3_column_int > ',(IFWIN#'+'),' i x i' ) &cd
+sqlite3_column_name=: (lib, ' sqlite3_column_name > ',(IFWIN#'+'),' x x i' ) &cd
+sqlite3_column_origin_name=: (lib, ' sqlite3_column_origin_name > ',(IFWIN#'+'),' x x i' ) &cd
+sqlite3_column_table_name=: (lib, ' sqlite3_column_table_name > ',(IFWIN#'+'),' x x i' ) &cd
+sqlite3_column_text=: (lib, ' sqlite3_column_text > ',(IFWIN#'+'),' x x i' ) &cd
+sqlite3_column_type=: (lib, ' sqlite3_column_type > ',(IFWIN#'+'),' i x i' ) &cd
+sqlite3_db_handle=: (lib, ' sqlite3_db_handle > ',(IFWIN#'+'),' x x' ) &cd
+sqlite3_enable_shared_cache=: (lib, ' sqlite3_enable_shared_cache > ',(IFWIN#'+'),' i i' ) &cd
+sqlite3_errcode=: (lib, ' sqlite3_errcode > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_errmsg=: (lib, ' sqlite3_errmsg > ',(IFWIN#'+'),' x x' ) &cd
+sqlite3_exec=: (lib, ' sqlite3_exec   ',(IFWIN#'+'),' i x *c x x *x' ) &cd
+sqlite3_extended_result_codes=: (lib, ' sqlite3_extended_result_codes > ',(IFWIN#'+'),' i x i' ) &cd
+sqlite3_finalize=: (lib, ' sqlite3_finalize > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_free=: (lib, ' sqlite3_free > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_free_table=: (lib, ' sqlite3_free_table > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_get_autocommit=: (lib, ' sqlite3_get_autocommit > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_get_table=: (lib, ' sqlite3_get_table > ',(IFWIN#'+'),' i x *c *x *i *i *x' ) &cd
+sqlite3_initialize=: (lib, ' sqlite3_initialize > ',(IFWIN#'+'),' i') &cd
+sqlite3_last_insert_rowid=: (lib, ' sqlite3_last_insert_rowid > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_libversion=: (lib, ' sqlite3_libversion > ',(IFWIN#'+'),' x' ) &cd
+sqlite3_libversion_number=: (lib, ' sqlite3_libversion_number > ',(IFWIN#'+'),' i' ) &cd
+sqlite3_open=: (lib, ' sqlite3_open   ',(IFWIN#'+'),' i *c *x' ) &cd
+sqlite3_open_v2=: (lib, ' sqlite3_open_v2   ',(IFWIN#'+'),' i *c *x i *c' ) &cd
+sqlite3_prepare=: (lib, ' sqlite3_prepare   ',(IFWIN#'+'),' i x *c i *x *x' ) &cd
+sqlite3_prepare_v2=: (lib, ' sqlite3_prepare_v2   ',(IFWIN#'+'),' i x *c i *x *x' ) &cd
+sqlite3_reset=: (lib, ' sqlite3_reset > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_shutdown=: (lib, ' sqlite3_shutdown > ',(IFWIN#'+'),' i') &cd
+sqlite3_step=: (lib, ' sqlite3_step > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_table_column_metadata=: (lib, ' sqlite3_table_column_metadata   ',(IFWIN#'+'),' i x *c *c *c *x *x *i *i *i' ) &cd
+sqlite3_total_changes=: (lib, ' sqlite3_total_changes > ',(IFWIN#'+'),' i x' ) &cd
 
 NB. =========================================================
 NB. sqlite extensions:
-sqlite3_extversion=: (libsqlite, ' sqlite3_extversion > ',(IFWIN#'+'),' x') &cd
-sqlite3_free_values=: (libsqlite, ' sqlite3_free_values > ',(IFWIN#'+'),' i *') &cd
-sqlite3_read_values=: (libsqlite, ' sqlite3_read_values ',(IFWIN#'+'),' i x *') &cd
+sqlite3_extopen=: (lib, ' sqlite3_extopen ',(IFWIN#'+'),' i *c *x i x d *c *c' ) &cd
+sqlite3_extversion=: (lib, ' sqlite3_extversion > ',(IFWIN#'+'),' x') &cd
+sqlite3_exec_values=: (lib, ' sqlite3_exec_values > ',(IFWIN#'+'),' i x *c i i *i *i *c') &cd
+sqlite3_free_values=: (lib, ' sqlite3_free_values > ',(IFWIN#'+'),' i *') &cd
+sqlite3_read_values0=: (lib, ' readvalues ',(IFWIN#'+'),' i x *') &cd
+sqlite3_read_values=: (lib, ' sqlite3_read_values ',(IFWIN#'+'),' i x *c *') &cd
+sqlite3_select_values=: (lib, ' sqlite3_select_values ',(IFWIN#'+'),' i x *c * i *i *i *c') &cd
+
+4!:55 <'lib'
 
 NB. stock android libsqlite.so did not compiled with the SQLITE_ENABLE_COLUMN_METADATA
 3 : 0''
-has_sqlite3_extversion=: 0 -.@-: sqlite3_extversion ::0: ''
+has_sqlite3_extversion=: 107 <: sqlite3_extversion ::0: ''
 if. (IFIOS +. UNAME-:'Android')>has_sqlite3_extversion do.
   sqlite3_column_database_name=: 0:
   sqlite3_column_origin_name=: 0:

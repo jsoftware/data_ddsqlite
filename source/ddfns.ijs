@@ -297,7 +297,7 @@ if. sqlresok rc=. y ddsel~ 'PRAGMA table_info(',x,')' do.
   end.
 end.
 
-if. SQLITE_OK = >@{. z=. ('select * from ', x,' where 1=0') preparestmt y do.
+if. SQLITE_OK = >@{. z=. ('select * from ', x,' limit 0') preparestmt y do.
   sh=. 1{::z
   err=. 0 [ r=. 0 0$<'' [ cat=. ''
 
@@ -392,7 +392,13 @@ if. keyname e.~ <'timeout' do.
 end.
 
 handle=. ,_1
-if. SQLITE_OK~: >@{. cdrc=. sqlite3_open_v2 (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_FULLMUTEX+SQLITE_OPEN_SHAREDCACHE+(nocreate{SQLITE_OPEN_CREATE,0));<<0 do.
+if. has_sqlite3_extversion do.
+  nul=. SQLITE_NULL_INTEGER;SQLITE_NULL_FLOAT;SQLITE_NULL_TEXT
+  cdrc=. sqlite3_extopen (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_FULLMUTEX+SQLITE_OPEN_SHAREDCACHE+(nocreate{SQLITE_OPEN_CREATE,0));nul,<<0
+else.
+  cdrc=. sqlite3_open_v2 (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_FULLMUTEX+SQLITE_OPEN_SHAREDCACHE+(nocreate{SQLITE_OPEN_CREATE,0));<<0
+end.
+if. SQLITE_OK~: >@{. cdrc do.
   errret ISI19 return.
 end.
 handle=. 2{::cdrc

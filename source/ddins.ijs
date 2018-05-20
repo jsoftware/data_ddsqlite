@@ -54,7 +54,7 @@ if. 2>#x do. errret ISI08 return. end.
 if. -. *./ 2>: #@$&> }.x do. errret ISI08 return. end.
 if. 1<#rows=. ~. > {.@$&>}.x do. errret ISI08 return. end.
 if. 0=rows=. fat rows do. SQL_NO_DATA; 0 return. end.
-sql=. utf8 , 0{::x
+sql=. dltb utf8 , 0{::x
 if. SQL_ERROR-: z=. y ddcoltype~ sql do. z return. end.
 if. (<SQL_ERROR)-: {.z do. z return. end.
 'oty ty lns'=. |: _3]\;8 13 9{("1) z=. 1&{::^:UseErrRet z
@@ -91,6 +91,16 @@ if. (<:#x)~:#ty do.
   errret ISI50 return.
 end.
 inssql=. 'insert into ', (>@{.tbl), '(', (}. ; (<',') ,("0) flds), ') values (', (}. ; (#flds)#<',?'), ')'
+if. has_sqlite3_extversion *. 1=#tbl do.
+  sql2=. 'select ', (}. ; (<',') ,&.> (flds)), ' from ', (>@{.tbl), ' limit 0'
+  if. SQL_ERROR-: z=. y ddcoltype~ sql2 do. z return. end.
+  if. (<SQL_ERROR)-: {.z do. z return. end.
+  'oty ty lns'=. |: _3]\;8 13 9{("1) z=. 1&{::^:UseErrRet z
+  typ=. gettyp"0 oty
+  if. _1 e. typ do. errret ISI51 return. end.
+  r=. y execparm inssql;flds;typ;oty;< }.x
+  return.
+end.
 z=. (inssql ; (|: oty,.lns,.ty) ; (}.x)) ddparm y
 )
 
@@ -162,11 +172,11 @@ clr 0
 if. -.(isiu y) *. (isbx x) do. errret ISI08 return. end.
 if. -.y e.CHALL do. errret ISI03 return. end.
 if. 2>#x do. errret ISI08 return. end.
-sql=. ,0{::x
+sql=. dltb utf8 ,0{::x
 if. -.(iscl sql) do. errret ISI08 return. end.
 if. ''-:table=. 0{:: tp=. parsesqlparm sql do. errret ISI08 return. end.
 if. tp ~:&# x do. errret ISI08 return. end.
-sql2=. 'select ', (}. ; (<',') ,&.> (}.tp)), ' from ', table, ' where 1=0'
+sql2=. 'select ', (}. ; (<',') ,&.> (}.tp)), ' from ', table, ' limit 0'
 if. SQL_ERROR-: z=. y ddcoltype~ sql2 do. z return. end.
 if. (<SQL_ERROR)-: {.z do. z return. end.
 'oty ty lns'=. |: _3]\;8 13 9{("1) z=. 1&{::^:UseErrRet z
@@ -195,7 +205,7 @@ clr DDROWCNT=: 0
 if. -.(isiu y) *. (isbx x) do. errret ISI08 return. end.
 if. -.y e.CHALL do. errret ISI03 return. end.
 if. 3>#x do. errret ISI08 return. end.
-sql=. utf8 , >0{x
+sql=. dltb utf8 , >0{x
 tyln=. >1{x
 if. -.(iscl sql) *. (isiu tyln) do. errret ISI08 return. end.
 if. 1 e. 2< #@$&> 2}.x do. errret ISI08 return. end.
@@ -224,6 +234,14 @@ end.
 
 if. (#x) ~: of+#ty do. errret ISI50 return. end.
 if. 0=rows do. ret_DD_OK SQL_NO_DATA return. end.
+
+if. ''-:table=. 0{:: tp=. parsesqlparm sql do. errret ISI08 return. end.
+if. has_sqlite3_extversion *. (0=+./ ' ,' e. (deb table)) *. ('update'-:6{.sql)+.('insert'-:6{.sql)+.('delete'-:6{.sql) do.
+  typ=. gettyp"0 sqlty
+  if. _1 e. typ do. errret ISI51 return. end.
+  r=. y execparm sql;(}.tp);typ;sqlty;< 2}.x
+  return.
+end.
 
 loctran=. 0
 if. y -.@e. CHTR do.
@@ -263,7 +281,8 @@ for_i. i.ncol do.
   bnamel=. 'BINDLN',(":sh),'_',":i
   select. t=. i{ty
   case. SQL_INTEGER do.
-    nul=. (0~:NumericNull) *. NumericNull= da=. ,(i+of){::x
+    nul=. (0~:IntegerNull) *. IntegerNull= da=. ,(i+of){::x
+    nul=. nul +. (0~:NumericNull) *. NumericNull= da
     nr=. #(bname)=: <. 0 (I.nul)}da
     (bnamel)=: nr$IF64{4 8
     (bnamel)=: SQL_NULL_DATA (I. nul)} bnamel~
@@ -399,3 +418,108 @@ freestmt sh
 if. loctran do. SQL_COMMIT transact y end.
 ret_DD_OK DD_OK
 )
+
+NB. execparm
+
+NB. =========================================================
+NB.*execparm v execute parameterized query
+execparm=: 4 : 0
+'sel nms typ oty dat'=. y
+ch=. x
+rws=. #0 pick dat
+val=. (<"1 typ,.oty) fixparm each dat
+if. 1 e. a:&-:&>val do.
+  errret ISI10
+  return.
+end.
+rc=. sqlite3_exec_values ch;sel;rws;(#typ);typ;(#&>val);;val
+if. 0~:rc do.
+  errret ISI10
+  return.
+end.
+ret_DD_OK DD_OK
+)
+
+NB. =========================================================
+NB.*fixparm v fix data for parm exec
+NB. fix data for write
+fixparm=: 4 : 0
+'x x0'=. x
+t=. 3!:0 y
+if. x=1 do.
+  if. NumericNull e. ,y do.
+    t=. 3!:0 y=. <. IntegerNull (I. NumericNull=,y)},y
+  end.
+  if. t e. 1 4 do. (2+IF64) (3!:4) (-~2)&+ ,y else. a: end. return.
+end.
+if. x=2 do.
+  if. t e. 1 4 8 do. 2 (3!:5) (-~1.5)&+ ,y else. a: end. return.
+end.
+if. x=3 do.
+  if. x0 -.@e. SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP do.
+    if. 32=t do.
+      if. 0 e. 2 = 3!:0 &> y do. a: return. end.
+      ; (,&({.a.))@dtb&.> y return.
+    elseif. 2=t do.
+      ; (,&({.a.))@dtb&.> <"1 y return.
+    elseif. do.
+      a: return.
+    end.
+  else.
+    if. UseDayNo do.
+      if. 1 4 8 -.@e.~ 3!:0 da=. y do.
+        a: return.
+      end.
+      nul=. DateTimeNull= da=. ,da
+      da=. isotimestamp 1 tsrep <.86400000* 0 (I.nul)}da
+      if. SQL_TYPE_TIMESTAMP= t do. da=. 23{."1 da
+      elseif. SQL_TYPE_DATE= t do. da=. 10{."1 da
+      elseif. SQL_TYPE_TIME= t do. da=. 11}."1 da
+      end.
+    else.
+      if. 2 131072 262144 -.@e.~ 3!:0 da=. y do.
+        a: return.
+      end.
+      if. 2>#@$ da do. da=. ,: ,da end.
+      nul=. (*./"1 e.&' '"1 da) +. (+./"1 '1800-01-01'&E."1 da) +. (+./"1 'NULL'&E."1 da)
+      if. SQL_TYPE_TIMESTAMP= t do. da=. 23{."1 da
+      elseif. SQL_TYPE_DATE= t do. da=. 10{."1 da
+      elseif. SQL_TYPE_TIME= t do. da
+      end.
+    end.
+    if. #nul do.
+      if. (#SQLITE_NULL_TEXT)>{:@$da do.
+        da=. (#SQLITE_NULL_TEXT){."1 da
+      end.
+      da=. (({:@$da){.SQLITE_NULL_TEXT) (I. nul)} da
+    end.
+    ; (,&({.a.))@dtb&.> <"1 da return.
+  end.
+end.
+if. x=4 do.
+  if. 32=t do.
+    if. 0 e. 2 = 3!:0 &> y do. a: return. end.
+    (2 (3!:4) # &> y),;y
+  elseif. 2=t do.
+    if. 2>$$y do. n1=. 1 else. n1=. {.@$ y end.
+    (2 (3!:4) n1#{:@$y), ,y
+  elseif. do.
+    a:
+  end.
+  return.
+end.
+a:
+)
+
+NB. types: 1 int 2 float 3 text 4 blob
+gettyp=: 3 : 0
+select. y
+case. SQL_INTEGER do. 1
+case. SQL_DOUBLE do. 2
+case. SQL_CHAR;SQL_WCHAR;SQL_VARCHAR;SQL_WVARCHAR;SQL_LONGVARCHAR;SQL_WLONGVARCHAR do. 3
+case. SQL_LONGVARBINARY do. 4
+case. SQL_TYPE_DATE;SQL_TYPE_TIME;SQL_TYPE_TIMESTAMP do. 3
+case. do. _1
+end.
+)
+

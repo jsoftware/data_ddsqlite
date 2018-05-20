@@ -8,11 +8,23 @@ afi_z_=: |:@:(<"_1@>)  NB. atomic from inverted
 ttally_z_=: *@# * #@>@{.
 
 DateTimeNull=: _1
-NumericNull=: _
+IntegerNull=: <.-2^<:32*1+IF64
+NumericNull=: __
 InitDone=: (InitDone_jddsqlite_"_)^:(0=4!:0<'InitDone_jddsqlite_') 0
 UseErrRet=: 0
 UseDayNo=: 0
 UseUnicode=: 0
+
+NB. datatypes for parameterized commands:
+SQLITE_INTEGER_z_=: 1
+SQLITE_FLOAT_z_=: 2
+SQLITE_TEXT_z_=: 3
+SQLITE_BLOB_z_=: 4
+
+NB. default nulls for read/write (text same as blob):
+SQLITE_NULL_INTEGER=: IntegerNull
+SQLITE_NULL_FLOAT=: NumericNull
+SQLITE_NULL_TEXT=: 'NULL'
 
 create=: 3 : 0
 if. 0=InitDone_jddsqlite_ do.
@@ -39,7 +51,7 @@ wrds=. wrds, ' dddrv ddsql ddcnt ddtrn ddcom ddrbk ddbind ddfetch'
 wrds=. wrds ,' dddata ddfet ddbtype ddcheck ddrow ddins ddparm ddsparm dddbms ddcolinfo ddttrn'
 wrds=. wrds ,' dddriver ddconfig ddcoltype'
 wrds=. wrds ,' userfn createdb exec sqlbad sqlok sqlres sqlresok'
-wrds=. wrds , ' ', ;:^:_1 ('get'&,)&.> ;: ' DateTimeNull NumericNull UseErrRet UseDayNo UseUnicode CHALL'
+wrds=. wrds , ' ', ;:^:_1 ('get'&,)&.> ;: ' DateTimeNull IntegerNull NumericNull UseErrRet UseDayNo UseUnicode CHALL'
 wrds=. > ;: wrds
 
 cl=. '_jddsqlite_'

@@ -12,7 +12,7 @@ SEX varchar(1) collate rtrim,
 DEPT varchar(4) collate rtrim,
 DOB date,
 DOH date,
-SALARY NUMERIC,
+SALARY float,
 PHOTO blob );
 )
 
@@ -23,7 +23,7 @@ SEX varchar(1) collate rtrim,
 DEPT varchar(4) collate rtrim,
 DOB int,
 DOH int,
-SALARY int,
+SALARY float,
 PHOTO blob );
 )
 
@@ -101,6 +101,7 @@ smoutput dddrv''
 
 smoutput '>> ddsrc'
 smoutput ddsrc''
+
 
 smoutput '>> delete old database'
 f=. jpath '~temp/jdata.sqlite'
@@ -204,14 +205,14 @@ if. _1~: ch=. ddcon 'database=',f,';nocreate=0' do.
   smoutput dderr''
 
   smoutput '>> ddins'
-  len=. 1e3
+  len=. has_sqlite3_extversion_jddsqlite_{1e4 1e6
   if. integerdate do.
     data=. ((len, 5)$'A''BCDEF');((len, 1)$'MF');((len, 4)$'E101E201');((len, 1)$19910213);((len, 1)$20081203);(,. 1+i.len)
   else.
     if. UseDayNo do.
       data=. ((len,5)$'A''BCDEF');((len,1)$'MF');((len,4)$'E101E201');(len$todayno 1991 2 13);(len$DateTimeNull_jddsqlite_,todayno 2008 12 3);(,.len$NumericNull_jddsqlite_,len)
     else.
-      data=. ((len,5)$'A''BCDEF');((len,1)$'MF');((len,4)$'E101E201');((len,10)$'1991-02-13');((len,10)$'          2008-12-03');(,.len$NumericNull_jddsqlite_,len)
+      data=. ((len,5)$'A''BCDEF');((len,1)$'MF');((len,4)$'E101E201');((len,10)$'1991-02-13');((len,10)$'2008-12-03');(,.len$NumericNull_jddsqlite_,len)
     end.
   end.
   smoutput '>> begin insert ', (":len), ' rows'
@@ -245,7 +246,7 @@ if. _1~: ch=. ddcon 'database=',f,';nocreate=0' do.
   ch ddsql~ 'delete from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203'
   smoutput '>> begin insert ', (":len), ' rows'
   sql=. 'insert into tdata(NAME, SEX, DEPT, DOB, DOH, SALARY) values (?,?,?,?,?,?)'
-  if. _1~: rc=. ch ddparm~ sql;((3#SQL_VARCHAR),(2#integerdate{::SQL_TYPE_DATE,SQL_INTEGER),SQL_INTEGER);data do.
+  if. _1~: rc=. ch ddparm~ sql;((3#SQL_VARCHAR),(2#integerdate{::SQL_TYPE_DATE,SQL_INTEGER),SQL_DOUBLE);data do.
     smoutput '>> finish insert ', (":len), ' rows'
     smoutput '>> ddcnt'
     smoutput ddcnt ch
@@ -277,7 +278,7 @@ if. _1~: ch=. ddcon 'database=',f,';nocreate=0' do.
     smoutput dderr''
   end.
 
-  smoutput '>> ddsparm'
+  smoutput '>> update with ddsparm'
   if. 0= rc=. ch ddsparm~ 'update tdata set PHOTO=? where NAME=?';(>'photo1';'photo2';'photo3');< (>'Abbott K';'Nobody';'Denny D') do.
     smoutput '>> ddcnt'
     smoutput ddcnt ch

@@ -22,7 +22,7 @@ SEX varchar(1) collate rtrim,
 DEPT varchar(4) collate rtrim,
 DOB date,
 DOH date,
-SALARY NUMERIC,
+SALARY float,
 PHOTO blob );
 )
 
@@ -33,7 +33,7 @@ SEX varchar(1) collate rtrim,
 DEPT varchar(4) collate rtrim,
 DOB int,
 DOH int,
-SALARY int,
+SALARY float,
 PHOTO blob );
 )
 
@@ -223,14 +223,14 @@ if. sqlresok__db rc=. ddcon__db 'database=',f,';nocreate=0' do.
   smoutput dderr__db''
 
   smoutput '>> ddins'
-  len=. 1e3
+  len=. has_sqlite3_extversion_jddsqlite_{1e4 1e6
   if. integerdate do.
     data=. ((len, 5)$'A''BCDEF');((len, 1)$'MF');((len, 4)$'E101E201');((len, 1)$19910213);((len, 1)$20081203);(,. 1+i.len)
   else.
     if. UseDayNo do.
       data=. ((len,5)$'A''BCDEF');((len,1)$'MF');((len,4)$'E101E201');(len$todayno 1991 2 13);(len$DateTimeNull__db,todayno 2008 12 3);(,.len$NumericNull__db,len)
     else.
-      data=. ((len,5)$'A''BCDEF');((len,1)$'MF');((len,4)$'E101E201');((len,10)$'1991-02-13');((len,10)$'          2008-12-03');(,.len$NumericNull__db,len)
+      data=. ((len,5)$'A''BCDEF');((len,1)$'MF');((len,4)$'E101E201');((len,10)$'1991-02-13');((len,10)$'2008-12-03');(,.len$NumericNull__db,len)
     end.
   end.
   smoutput '>> begin insert ', (":len), ' rows'
@@ -267,7 +267,7 @@ if. sqlresok__db rc=. ddcon__db 'database=',f,';nocreate=0' do.
   ch ddsql__db~ 'delete from tdata where DOH=', integerdate{::'''2008-12-03''';'20081203'
   smoutput '>> begin insert ', (":len), ' rows'
   sql=. 'insert into tdata(NAME, SEX, DEPT, DOB, DOH, SALARY) values (?,?,?,?,?,?)'
-  if. _1~: rc=. ch ddparm__db~ sql;((3#SQL_VARCHAR),(2#integerdate{::SQL_TYPE_DATE,SQL_INTEGER),SQL_INTEGER);data do.
+  if. _1~: rc=. ch ddparm__db~ sql;((3#SQL_VARCHAR),(2#integerdate{::SQL_TYPE_DATE,SQL_INTEGER),SQL_DOUBLE);data do.
     smoutput '>> finish insert ', (":len), ' rows'
     smoutput '>> ddcnt'
     smoutput ddcnt__db ch
@@ -301,7 +301,7 @@ if. sqlresok__db rc=. ddcon__db 'database=',f,';nocreate=0' do.
     smoutput dderr__db''
   end.
 
-  smoutput '>> ddsparm'
+  smoutput '>> update with ddsparm'
   if. sqlresok__db rc=. ch ddsparm__db~ 'update tdata set PHOTO=? where NAME=?';(>'photo1';'photo2';'photo3');< (>'Abbott K';'Nobody';'Denny D') do.
     smoutput '>> ddcnt'
     smoutput ddcnt__db ch

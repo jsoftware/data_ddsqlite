@@ -13,10 +13,16 @@ if. -.iscl y do. _2 return. end.
 dbq=. utf8 ,>y
 if. fexist dbq do. _1 return. end.
 handle=. ,_1
-if. SQLITE_OK~: rc=. >@{. cdrc=. sqlite3_open_v2 (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_CREATE);<<0 do.
+if. has_sqlite3_extversion do.
+  nul=. SQLITE_NULL_INTEGER;SQLITE_NULL_FLOAT;SQLITE_NULL_TEXT
+  cdrc=. sqlite3_extopen (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_CREATE);nul,<<0
+else.
+  cdrc=. sqlite3_open_v2 (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_CREATE);<<0
+end.
+if. SQLITE_OK~: rc=. >@{. cdrc do.
   rc
 else.
-  0 [ sqlite3_close {.handle=. 2{::cdrc
+  0 [ sqlite3_close {. 2{::cdrc
 end.
 )
 

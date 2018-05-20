@@ -103,12 +103,12 @@ if. has_sqlite3_extversion *. (_1=r) do.
     end.
     if. UseUnicode do.
       for_i. I.(SQL_CHAR,SQL_WCHAR,SQL_WVARCHAR,SQL_WLONGVARCHAR) e.~ ty do.
-        data=. (< ucp&.> i{::data) i}data
+        data=. (< (ucp ::])&.> i{::data) i}data
       end.
     end.
     if. UseDayNo do.
       for_i. I.(SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP) e.~ ty do.
-        data=. (< ,. numdate`numtime`numdatetime@.((SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP)i.i{ty)&.> i{::data) i}data
+        data=. (< ,@(numdate`numtime`numdatetime@.((SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP)i.i{ty))&.> i{::data) i}data
       end.
     end.
   end.
@@ -134,7 +134,7 @@ for_i. i.#ty do.
   elseif. (SQL_CHAR,SQL_WCHAR,SQL_VARCHAR,SQL_WVARCHAR) e.~ i{ty do.
     (pref,":i)=. 0$''
   elseif. (SQL_LONGVARCHAR,SQL_WLONGVARCHAR) e.~ i{ty do.
-    (pref,":i)=. 0$<''
+    (pref,":i)=. 0$''
   elseif. SQL_LONGVARBINARY = i{ty do.
     (pref,":i)=. 0$<''
   elseif. (SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP) e.~ i{ty do.
@@ -163,21 +163,21 @@ NB.     ddend^:(-.UseErrRet) sh
     4!:55 <(pref,":i)
     if. SQLITE_NULL= sqlite3_column_type (b0 i{cc) do.
       if. SQL_INTEGER = i{ty do.
-        tmp=. tmp, NumericNull
+        tmp=. tmp, IntegerNull
       elseif. SQL_DOUBLE = i{ty do.
         tmp=. tmp, NumericNull
       elseif. (SQL_CHAR,SQL_WCHAR,SQL_VARCHAR,SQL_WVARCHAR) e.~ i{ty do.
-        tmp=. tmp, {.a.
+        tmp=. tmp, SQLITE_NULL_TEXT,{.a.
       elseif. (SQL_LONGVARCHAR,SQL_WLONGVARCHAR) e.~ i{ty do.
-        tmp=. tmp, <{.a.
+        tmp=. tmp, SQLITE_NULL_TEXT,{.a.
       elseif. SQL_LONGVARBINARY = i{ty do.
-        tmp=. tmp, <''
+        tmp=. tmp, <SQLITE_NULL_TEXT
       elseif. SQL_TYPE_DATE = i{ty do.
-        tmp=. tmp, {.a.
+        tmp=. tmp, SQLITE_NULL_TEXT,{.a.
       elseif. SQL_TYPE_TIME = i{ty do.
-        tmp=. tmp, {.a.
+        tmp=. tmp, SQLITE_NULL_TEXT,{.a.
       elseif. SQL_TYPE_TIMESTAMP = i{ty do.
-        tmp=. tmp, {.a.
+        tmp=. tmp, SQLITE_NULL_TEXT,{.a.
       elseif. do.
         tmp=. tmp, {.a.
       end.
@@ -189,7 +189,7 @@ NB.     ddend^:(-.UseErrRet) sh
       elseif. (SQL_CHAR,SQL_WCHAR,SQL_VARCHAR,SQL_WVARCHAR) e.~ i{ty do.
         tmp=. tmp, datchar i{cc
       elseif. (SQL_LONGVARCHAR,SQL_WLONGVARCHAR) e.~ i{ty do.
-        tmp=. tmp, (<@:(ucp^:UseUnicode)@:}:@:datchar)`((<'')"_)@.ignorelongdata i{cc
+        tmp=. tmp, datchar`(({.a.)"_)@.ignorelongdata i{cc
       elseif. SQL_LONGVARBINARY = i{ty do.
         tmp=. tmp, datblob`((<'')"_)@.ignorelongdata i{cc
       elseif. SQL_TYPE_DATE = i{ty do.
@@ -247,12 +247,12 @@ else.
     elseif. (SQL_CHAR,SQL_WCHAR,SQL_VARCHAR,SQL_WVARCHAR) e.~ i{ty do.
       dat=. dat, < <;._2 ucp^:UseUnicode (pref,":i)~
     elseif. (SQL_LONGVARCHAR,SQL_WLONGVARCHAR) e.~ i{ty do.
-      dat=. dat, < (pref,":i)~
+      dat=. dat, < <;._2 ucp^:UseUnicode (pref,":i)~
     elseif. SQL_LONGVARBINARY = i{ty do.
       dat=. dat, < (pref,":i)~
     elseif. (SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP) e.~ i{ty do.
       if. UseDayNo do.
-        dat=. dat, < numdate`numtime`numdatetime@.((SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP)i.i{ty);._2 (pref,":i)~
+        dat=. dat, < ,@(numdate`numtime`numdatetime@.((SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP)i.i{ty));._2 (pref,":i)~
       else.
         dat=. dat, < <;._2 (pref,":i)~
       end.
@@ -273,7 +273,9 @@ NB. =========================================================
 numdate=: 3 : 0
 if. 0= #y=. dltb y do.
   DateTimeNull
-else.
+elseif. SQLITE_NULL_TEXT-:y do.
+  DateTimeNull
+elseif. do.
   86400000%~ tsrep 0 0 0,~ 3{. ". ' 0123456789' ([-.-.)~ ' ' (I. y e. '-:+TZ')}y
 end.
 )
@@ -281,7 +283,9 @@ end.
 numtime=: 3 : 0"1
 if. 0= #y=. dltb y do.
   DateTimeNull
-else.
+elseif. SQLITE_NULL_TEXT-:y do.
+  DateTimeNull
+elseif. do.
   86400000%~ tsrep 0 (0 1 2)} 6{. ". ' 0123456789' ([-.-.)~ ' ' (I. y e. '-:+TZ')}y
 end.
 )
@@ -289,7 +293,9 @@ end.
 numdatetime=: 3 : 0"1
 if. 0= #y=. dltb y do.
   DateTimeNull
-else.
+elseif. SQLITE_NULL_TEXT-:y do.
+  DateTimeNull
+elseif. do.
   86400000%~ tsrep 6{. ". ' 0123456789' ([-.-.)~ ' ' (I. y e. '-:+TZ')}y
 end.
 )
@@ -298,7 +304,7 @@ NB. =========================================================
 NB. read column data
 sqlread0=: 3 : 0
 sh=. y
-'rc j res'=. sqlite3_read_values sh;,2
+'rc j res'=. sqlite3_read_values0 sh;,2
 assert. rc = SQLITE_DONE
 SZI=. IF64{4 8
 'buf typ nms len rws cls'=. memr res, 0 6 4

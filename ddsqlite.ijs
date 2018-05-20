@@ -5,11 +5,19 @@ afi_z_=: |:@:(<"_1@>)
 ttally_z_=: *@# * #@>@{.
 
 DateTimeNull=: _1
-NumericNull=: _
+IntegerNull=: <.-2^<:32*1+IF64
+NumericNull=: __
 InitDone=: (InitDone_jddsqlite_"_)^:(0=4!:0<'InitDone_jddsqlite_') 0
 UseErrRet=: 0
 UseDayNo=: 0
 UseUnicode=: 0
+SQLITE_INTEGER_z_=: 1
+SQLITE_FLOAT_z_=: 2
+SQLITE_TEXT_z_=: 3
+SQLITE_BLOB_z_=: 4
+SQLITE_NULL_INTEGER=: IntegerNull
+SQLITE_NULL_FLOAT=: NumericNull
+SQLITE_NULL_TEXT=: 'NULL'
 
 create=: 3 : 0
 if. 0=InitDone_jddsqlite_ do.
@@ -31,7 +39,7 @@ wrds=. wrds, ' dddrv ddsql ddcnt ddtrn ddcom ddrbk ddbind ddfetch'
 wrds=. wrds ,' dddata ddfet ddbtype ddcheck ddrow ddins ddparm ddsparm dddbms ddcolinfo ddttrn'
 wrds=. wrds ,' dddriver ddconfig ddcoltype'
 wrds=. wrds ,' userfn createdb exec sqlbad sqlok sqlres sqlresok'
-wrds=. wrds , ' ', ;:^:_1 ('get'&,)&.> ;: ' DateTimeNull NumericNull UseErrRet UseDayNo UseUnicode CHALL'
+wrds=. wrds , ' ', ;:^:_1 ('get'&,)&.> ;: ' DateTimeNull IntegerNull NumericNull UseErrRet UseDayNo UseUnicode CHALL'
 wrds=. > ;: wrds
 
 cl=. '_jddsqlite_'
@@ -55,15 +63,13 @@ elseif. UNAME-:'Android' do.
   t=. (jpath'~bin/../libexec/android-libs/',arch,'/libjsqlite3.so')
   fnd=. 0-.@-:(t, ' sqlite3_extversion > ',(IFWIN#'+'),' x')&cd ::0: ''
 elseif. do.
-  if. -. ((<UNAME) e.'Darwin';'Linux')>IF64+.IFRASPI do.
-    ext=. (('Darwin';'Linux') i. <UNAME) pick ;:'dylib so dll'
-    t=. 'libjsqlite3',((-.IF64+.IFRASPI)#'_32'),'.',ext
-    if. 0-.@-:(t, ' sqlite3_extversion > ',(IFWIN#'+'),' x')&cd ::0: '' do.
-      fnd=. 1
-    else.
-      t=. jpath '~addons/data/sqlite/lib/libjsqlite3',((-.IF64+.IFRASPI)#'_32'),'.',ext
-      fnd=. 0-.@-:(t, ' sqlite3_extversion > ',(IFWIN#'+'),' x')&cd ::0: ''
-    end.
+  ext=. (('Darwin';'Linux') i. <UNAME) pick ;:'dylib so dll'
+  t=. 'libjsqlite3',((-.IF64)#'_32'),'.',ext
+  if. 0-.@-:(t, ' sqlite3_extversion > ',(IFWIN#'+'),' x')&cd ::0: '' do.
+    fnd=. 1
+  else.
+    t=. jpath '~addons/data/sqlite/lib/libjsqlite3',((-.IF64)#'_32'),'.',ext
+    fnd=. 0-.@-:(t, ' sqlite3_extversion > ',(IFWIN#'+'),' x')&cd ::0: ''
   end.
 end.
 if. fnd do.
@@ -137,59 +143,67 @@ SQLITE_UTF16_ALIGNED=: 8
 
 SQLITE_STATIC=: 0
 SQLITE_TRANSIENT=: _1
-sqlite3_bind_blob=: (libsqlite, ' sqlite3_bind_blob > ',(IFWIN#'+'),' i x i *c i x' ) &cd
-sqlite3_bind_double=: (libsqlite, ' sqlite3_bind_double > ',(IFWIN#'+'),' i x i d' ) &cd
-sqlite3_bind_int64=: (libsqlite, ' sqlite3_bind_int64 > ',(IFWIN#'+'),' i x i x' ) &cd
-sqlite3_bind_int=: (libsqlite, ' sqlite3_bind_int > ',(IFWIN#'+'),' i x i i' ) &cd
-sqlite3_bind_null=: (libsqlite, ' sqlite3_bind_null > ',(IFWIN#'+'),' i x i' ) &cd
-sqlite3_bind_parameter_count=: (libsqlite, ' sqlite3_bind_parameter_count > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_bind_text=: (libsqlite, ' sqlite3_bind_text > ',(IFWIN#'+'),' i x i *c i x' ) &cd
-sqlite3_bind_zeroblob=: (libsqlite, ' sqlite3_bind_zeroblob > ',(IFWIN#'+'),' i x i i' ) &cd
-sqlite3_busy_timeout=: (libsqlite, ' sqlite3_busy_timeout > ',(IFWIN#'+'),' i x i' ) &cd
-sqlite3_changes=: (libsqlite, ' sqlite3_changes > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_close=: (libsqlite, ' sqlite3_close > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_column_blob=: (libsqlite, ' sqlite3_column_blob > ',(IFWIN#'+'),' x x i' ) &cd
-sqlite3_column_bytes=: (libsqlite, ' sqlite3_column_bytes > ',(IFWIN#'+'),' i x i' ) &cd
-sqlite3_column_count=: (libsqlite, ' sqlite3_column_count > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_column_database_name=: (libsqlite, ' sqlite3_column_database_name > ',(IFWIN#'+'),' x x i' ) &cd
-sqlite3_column_decltype=: (libsqlite, ' sqlite3_column_decltype > ',(IFWIN#'+'),' x x i' ) &cd
-sqlite3_column_double=: (libsqlite, ' sqlite3_column_double > ',(IFWIN#'+'),' d x i' ) &cd
-sqlite3_column_int64=: (libsqlite, ' sqlite3_column_int64 > ',(IFWIN#'+'),' x x i' ) &cd
-sqlite3_column_int=: (libsqlite, ' sqlite3_column_int > ',(IFWIN#'+'),' i x i' ) &cd
-sqlite3_column_name=: (libsqlite, ' sqlite3_column_name > ',(IFWIN#'+'),' x x i' ) &cd
-sqlite3_column_origin_name=: (libsqlite, ' sqlite3_column_origin_name > ',(IFWIN#'+'),' x x i' ) &cd
-sqlite3_column_table_name=: (libsqlite, ' sqlite3_column_table_name > ',(IFWIN#'+'),' x x i' ) &cd
-sqlite3_column_text=: (libsqlite, ' sqlite3_column_text > ',(IFWIN#'+'),' x x i' ) &cd
-sqlite3_column_type=: (libsqlite, ' sqlite3_column_type > ',(IFWIN#'+'),' i x i' ) &cd
-sqlite3_db_handle=: (libsqlite, ' sqlite3_db_handle > ',(IFWIN#'+'),' x x' ) &cd
-sqlite3_enable_shared_cache=: (libsqlite, ' sqlite3_enable_shared_cache > ',(IFWIN#'+'),' i i' ) &cd
-sqlite3_errcode=: (libsqlite, ' sqlite3_errcode > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_errmsg=: (libsqlite, ' sqlite3_errmsg > ',(IFWIN#'+'),' x x' ) &cd
-sqlite3_exec=: (libsqlite, ' sqlite3_exec   ',(IFWIN#'+'),' i x *c x x *x' ) &cd
-sqlite3_extended_result_codes=: (libsqlite, ' sqlite3_extended_result_codes > ',(IFWIN#'+'),' i x i' ) &cd
-sqlite3_finalize=: (libsqlite, ' sqlite3_finalize > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_free=: (libsqlite, ' sqlite3_free > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_free_table=: (libsqlite, ' sqlite3_free_table > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_get_autocommit=: (libsqlite, ' sqlite3_get_autocommit > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_get_table=: (libsqlite, ' sqlite3_get_table > ',(IFWIN#'+'),' i x *c *x *i *i *x' ) &cd
-sqlite3_initialize=: (libsqlite, ' sqlite3_initialize > ',(IFWIN#'+'),' i') &cd
-sqlite3_last_insert_rowid=: (libsqlite, ' sqlite3_last_insert_rowid > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_libversion=: (libsqlite, ' sqlite3_libversion > ',(IFWIN#'+'),' x' ) &cd
-sqlite3_libversion_number=: (libsqlite, ' sqlite3_libversion_number > ',(IFWIN#'+'),' i' ) &cd
-sqlite3_open=: (libsqlite, ' sqlite3_open   ',(IFWIN#'+'),' i *c *x' ) &cd
-sqlite3_open_v2=: (libsqlite, ' sqlite3_open_v2   ',(IFWIN#'+'),' i *c *x i *c' ) &cd
-sqlite3_prepare=: (libsqlite, ' sqlite3_prepare   ',(IFWIN#'+'),' i x *c i *x *x' ) &cd
-sqlite3_prepare_v2=: (libsqlite, ' sqlite3_prepare_v2   ',(IFWIN#'+'),' i x *c i *x *x' ) &cd
-sqlite3_reset=: (libsqlite, ' sqlite3_reset > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_shutdown=: (libsqlite, ' sqlite3_shutdown > ',(IFWIN#'+'),' i') &cd
-sqlite3_step=: (libsqlite, ' sqlite3_step > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_table_column_metadata=: (libsqlite, ' sqlite3_table_column_metadata   ',(IFWIN#'+'),' i x *c *c *c *x *x *i *i *i' ) &cd
-sqlite3_total_changes=: (libsqlite, ' sqlite3_total_changes > ',(IFWIN#'+'),' i x' ) &cd
-sqlite3_extversion=: (libsqlite, ' sqlite3_extversion > ',(IFWIN#'+'),' x') &cd
-sqlite3_free_values=: (libsqlite, ' sqlite3_free_values > ',(IFWIN#'+'),' i *') &cd
-sqlite3_read_values=: (libsqlite, ' sqlite3_read_values ',(IFWIN#'+'),' i x *') &cd
+lib=. '"',libsqlite,'"'
+
+sqlite3_bind_blob=: (lib, ' sqlite3_bind_blob > ',(IFWIN#'+'),' i x i *c i x' ) &cd
+sqlite3_bind_double=: (lib, ' sqlite3_bind_double > ',(IFWIN#'+'),' i x i d' ) &cd
+sqlite3_bind_int64=: (lib, ' sqlite3_bind_int64 > ',(IFWIN#'+'),' i x i x' ) &cd
+sqlite3_bind_int=: (lib, ' sqlite3_bind_int > ',(IFWIN#'+'),' i x i i' ) &cd
+sqlite3_bind_null=: (lib, ' sqlite3_bind_null > ',(IFWIN#'+'),' i x i' ) &cd
+sqlite3_bind_parameter_count=: (lib, ' sqlite3_bind_parameter_count > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_bind_text=: (lib, ' sqlite3_bind_text > ',(IFWIN#'+'),' i x i *c i x' ) &cd
+sqlite3_bind_zeroblob=: (lib, ' sqlite3_bind_zeroblob > ',(IFWIN#'+'),' i x i i' ) &cd
+sqlite3_busy_timeout=: (lib, ' sqlite3_busy_timeout > ',(IFWIN#'+'),' i x i' ) &cd
+sqlite3_changes=: (lib, ' sqlite3_changes > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_close=: (lib, ' sqlite3_close > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_column_blob=: (lib, ' sqlite3_column_blob > ',(IFWIN#'+'),' x x i' ) &cd
+sqlite3_column_bytes=: (lib, ' sqlite3_column_bytes > ',(IFWIN#'+'),' i x i' ) &cd
+sqlite3_column_count=: (lib, ' sqlite3_column_count > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_column_database_name=: (lib, ' sqlite3_column_database_name > ',(IFWIN#'+'),' x x i' ) &cd
+sqlite3_column_decltype=: (lib, ' sqlite3_column_decltype > ',(IFWIN#'+'),' x x i' ) &cd
+sqlite3_column_double=: (lib, ' sqlite3_column_double > ',(IFWIN#'+'),' d x i' ) &cd
+sqlite3_column_int64=: (lib, ' sqlite3_column_int64 > ',(IFWIN#'+'),' x x i' ) &cd
+sqlite3_column_int=: (lib, ' sqlite3_column_int > ',(IFWIN#'+'),' i x i' ) &cd
+sqlite3_column_name=: (lib, ' sqlite3_column_name > ',(IFWIN#'+'),' x x i' ) &cd
+sqlite3_column_origin_name=: (lib, ' sqlite3_column_origin_name > ',(IFWIN#'+'),' x x i' ) &cd
+sqlite3_column_table_name=: (lib, ' sqlite3_column_table_name > ',(IFWIN#'+'),' x x i' ) &cd
+sqlite3_column_text=: (lib, ' sqlite3_column_text > ',(IFWIN#'+'),' x x i' ) &cd
+sqlite3_column_type=: (lib, ' sqlite3_column_type > ',(IFWIN#'+'),' i x i' ) &cd
+sqlite3_db_handle=: (lib, ' sqlite3_db_handle > ',(IFWIN#'+'),' x x' ) &cd
+sqlite3_enable_shared_cache=: (lib, ' sqlite3_enable_shared_cache > ',(IFWIN#'+'),' i i' ) &cd
+sqlite3_errcode=: (lib, ' sqlite3_errcode > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_errmsg=: (lib, ' sqlite3_errmsg > ',(IFWIN#'+'),' x x' ) &cd
+sqlite3_exec=: (lib, ' sqlite3_exec   ',(IFWIN#'+'),' i x *c x x *x' ) &cd
+sqlite3_extended_result_codes=: (lib, ' sqlite3_extended_result_codes > ',(IFWIN#'+'),' i x i' ) &cd
+sqlite3_finalize=: (lib, ' sqlite3_finalize > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_free=: (lib, ' sqlite3_free > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_free_table=: (lib, ' sqlite3_free_table > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_get_autocommit=: (lib, ' sqlite3_get_autocommit > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_get_table=: (lib, ' sqlite3_get_table > ',(IFWIN#'+'),' i x *c *x *i *i *x' ) &cd
+sqlite3_initialize=: (lib, ' sqlite3_initialize > ',(IFWIN#'+'),' i') &cd
+sqlite3_last_insert_rowid=: (lib, ' sqlite3_last_insert_rowid > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_libversion=: (lib, ' sqlite3_libversion > ',(IFWIN#'+'),' x' ) &cd
+sqlite3_libversion_number=: (lib, ' sqlite3_libversion_number > ',(IFWIN#'+'),' i' ) &cd
+sqlite3_open=: (lib, ' sqlite3_open   ',(IFWIN#'+'),' i *c *x' ) &cd
+sqlite3_open_v2=: (lib, ' sqlite3_open_v2   ',(IFWIN#'+'),' i *c *x i *c' ) &cd
+sqlite3_prepare=: (lib, ' sqlite3_prepare   ',(IFWIN#'+'),' i x *c i *x *x' ) &cd
+sqlite3_prepare_v2=: (lib, ' sqlite3_prepare_v2   ',(IFWIN#'+'),' i x *c i *x *x' ) &cd
+sqlite3_reset=: (lib, ' sqlite3_reset > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_shutdown=: (lib, ' sqlite3_shutdown > ',(IFWIN#'+'),' i') &cd
+sqlite3_step=: (lib, ' sqlite3_step > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_table_column_metadata=: (lib, ' sqlite3_table_column_metadata   ',(IFWIN#'+'),' i x *c *c *c *x *x *i *i *i' ) &cd
+sqlite3_total_changes=: (lib, ' sqlite3_total_changes > ',(IFWIN#'+'),' i x' ) &cd
+sqlite3_extopen=: (lib, ' sqlite3_extopen ',(IFWIN#'+'),' i *c *x i x d *c *c' ) &cd
+sqlite3_extversion=: (lib, ' sqlite3_extversion > ',(IFWIN#'+'),' x') &cd
+sqlite3_exec_values=: (lib, ' sqlite3_exec_values > ',(IFWIN#'+'),' i x *c i i *i *i *c') &cd
+sqlite3_free_values=: (lib, ' sqlite3_free_values > ',(IFWIN#'+'),' i *') &cd
+sqlite3_read_values0=: (lib, ' readvalues ',(IFWIN#'+'),' i x *') &cd
+sqlite3_read_values=: (lib, ' sqlite3_read_values ',(IFWIN#'+'),' i x *c *') &cd
+sqlite3_select_values=: (lib, ' sqlite3_select_values ',(IFWIN#'+'),' i x *c * i *i *i *c') &cd
+
+4!:55 <'lib'
 3 : 0''
-has_sqlite3_extversion=: 0 -.@-: sqlite3_extversion ::0: ''
+has_sqlite3_extversion=: 107 <: sqlite3_extversion ::0: ''
 if. (IFIOS +. UNAME-:'Android')>has_sqlite3_extversion do.
   sqlite3_column_database_name=: 0:
   sqlite3_column_origin_name=: 0:
@@ -623,7 +637,7 @@ if. sqlresok rc=. y ddsel~ 'PRAGMA table_info(',x,')' do.
   end.
 end.
 
-if. SQLITE_OK = >@{. z=. ('select * from ', x,' where 1=0') preparestmt y do.
+if. SQLITE_OK = >@{. z=. ('select * from ', x,' limit 0') preparestmt y do.
   sh=. 1{::z
   err=. 0 [ r=. 0 0$<'' [ cat=. ''
   hdr=. <;._1 ' TABLE_CAT TABLE_SCHEM TABLE_NAME COLUMN_NAME DATA_TYPE TYPE_NAME COLUMN_SIZE BUFFER_LENGTH DECIMAL_DIGITS NUM_PREC_RADIX NULLABLE REMARKS COLUMN_DEF SQL_DATA_TYPE SQL_DATETIME_SUB CHAR_OCTET_LENGTH ORDINAL_POSITION IS_NULLABLE'
@@ -685,7 +699,13 @@ if. keyname e.~ <'timeout' do.
 end.
 
 handle=. ,_1
-if. SQLITE_OK~: >@{. cdrc=. sqlite3_open_v2 (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_FULLMUTEX+SQLITE_OPEN_SHAREDCACHE+(nocreate{SQLITE_OPEN_CREATE,0));<<0 do.
+if. has_sqlite3_extversion do.
+  nul=. SQLITE_NULL_INTEGER;SQLITE_NULL_FLOAT;SQLITE_NULL_TEXT
+  cdrc=. sqlite3_extopen (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_FULLMUTEX+SQLITE_OPEN_SHAREDCACHE+(nocreate{SQLITE_OPEN_CREATE,0));nul,<<0
+else.
+  cdrc=. sqlite3_open_v2 (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_FULLMUTEX+SQLITE_OPEN_SHAREDCACHE+(nocreate{SQLITE_OPEN_CREATE,0));<<0
+end.
+if. SQLITE_OK~: >@{. cdrc do.
   errret ISI19 return.
 end.
 handle=. 2{::cdrc
@@ -1044,7 +1064,7 @@ if. 2>#x do. errret ISI08 return. end.
 if. -. *./ 2>: #@$&> }.x do. errret ISI08 return. end.
 if. 1<#rows=. ~. > {.@$&>}.x do. errret ISI08 return. end.
 if. 0=rows=. fat rows do. SQL_NO_DATA; 0 return. end.
-sql=. utf8 , 0{::x
+sql=. dltb utf8 , 0{::x
 if. SQL_ERROR-: z=. y ddcoltype~ sql do. z return. end.
 if. (<SQL_ERROR)-: {.z do. z return. end.
 'oty ty lns'=. |: _3]\;8 13 9{("1) z=. 1&{::^:UseErrRet z
@@ -1076,6 +1096,16 @@ if. (<:#x)~:#ty do.
   errret ISI50 return.
 end.
 inssql=. 'insert into ', (>@{.tbl), '(', (}. ; (<',') ,("0) flds), ') values (', (}. ; (#flds)#<',?'), ')'
+if. has_sqlite3_extversion *. 1=#tbl do.
+  sql2=. 'select ', (}. ; (<',') ,&.> (flds)), ' from ', (>@{.tbl), ' limit 0'
+  if. SQL_ERROR-: z=. y ddcoltype~ sql2 do. z return. end.
+  if. (<SQL_ERROR)-: {.z do. z return. end.
+  'oty ty lns'=. |: _3]\;8 13 9{("1) z=. 1&{::^:UseErrRet z
+  typ=. gettyp"0 oty
+  if. _1 e. typ do. errret ISI51 return. end.
+  r=. y execparm inssql;flds;typ;oty;< }.x
+  return.
+end.
 z=. (inssql ; (|: oty,.lns,.ty) ; (}.x)) ddparm y
 )
 parsesqlparm=: 3 : 0
@@ -1134,11 +1164,11 @@ clr 0
 if. -.(isiu y) *. (isbx x) do. errret ISI08 return. end.
 if. -.y e.CHALL do. errret ISI03 return. end.
 if. 2>#x do. errret ISI08 return. end.
-sql=. ,0{::x
+sql=. dltb utf8 ,0{::x
 if. -.(iscl sql) do. errret ISI08 return. end.
 if. ''-:table=. 0{:: tp=. parsesqlparm sql do. errret ISI08 return. end.
 if. tp ~:&# x do. errret ISI08 return. end.
-sql2=. 'select ', (}. ; (<',') ,&.> (}.tp)), ' from ', table, ' where 1=0'
+sql2=. 'select ', (}. ; (<',') ,&.> (}.tp)), ' from ', table, ' limit 0'
 if. SQL_ERROR-: z=. y ddcoltype~ sql2 do. z return. end.
 if. (<SQL_ERROR)-: {.z do. z return. end.
 'oty ty lns'=. |: _3]\;8 13 9{("1) z=. 1&{::^:UseErrRet z
@@ -1154,7 +1184,7 @@ clr DDROWCNT=: 0
 if. -.(isiu y) *. (isbx x) do. errret ISI08 return. end.
 if. -.y e.CHALL do. errret ISI03 return. end.
 if. 3>#x do. errret ISI08 return. end.
-sql=. utf8 , >0{x
+sql=. dltb utf8 , >0{x
 tyln=. >1{x
 if. -.(iscl sql) *. (isiu tyln) do. errret ISI08 return. end.
 if. 1 e. 2< #@$&> 2}.x do. errret ISI08 return. end.
@@ -1183,6 +1213,14 @@ end.
 
 if. (#x) ~: of+#ty do. errret ISI50 return. end.
 if. 0=rows do. ret_DD_OK SQL_NO_DATA return. end.
+
+if. ''-:table=. 0{:: tp=. parsesqlparm sql do. errret ISI08 return. end.
+if. has_sqlite3_extversion *. (0=+./ ' ,' e. (deb table)) *. ('update'-:6{.sql)+.('insert'-:6{.sql)+.('delete'-:6{.sql) do.
+  typ=. gettyp"0 sqlty
+  if. _1 e. typ do. errret ISI51 return. end.
+  r=. y execparm sql;(}.tp);typ;sqlty;< 2}.x
+  return.
+end.
 
 loctran=. 0
 if. y -.@e. CHTR do.
@@ -1220,7 +1258,8 @@ for_i. i.ncol do.
   bnamel=. 'BINDLN',(":sh),'_',":i
   select. t=. i{ty
   case. SQL_INTEGER do.
-    nul=. (0~:NumericNull) *. NumericNull= da=. ,(i+of){::x
+    nul=. (0~:IntegerNull) *. IntegerNull= da=. ,(i+of){::x
+    nul=. nul +. (0~:NumericNull) *. NumericNull= da
     nr=. #(bname)=: <. 0 (I.nul)}da
     (bnamel)=: nr$IF64{4 8
     (bnamel)=: SQL_NULL_DATA (I. nul)} bnamel~
@@ -1351,6 +1390,99 @@ freestmt sh
 if. loctran do. SQL_COMMIT transact y end.
 ret_DD_OK DD_OK
 )
+execparm=: 4 : 0
+'sel nms typ oty dat'=. y
+ch=. x
+rws=. #0 pick dat
+val=. (<"1 typ,.oty) fixparm each dat
+if. 1 e. a:&-:&>val do.
+  errret ISI10
+  return.
+end.
+rc=. sqlite3_exec_values ch;sel;rws;(#typ);typ;(#&>val);;val
+if. 0~:rc do.
+  errret ISI10
+  return.
+end.
+ret_DD_OK DD_OK
+)
+fixparm=: 4 : 0
+'x x0'=. x
+t=. 3!:0 y
+if. x=1 do.
+  if. NumericNull e. ,y do.
+    t=. 3!:0 y=. <. IntegerNull (I. NumericNull=,y)},y
+  end.
+  if. t e. 1 4 do. (2+IF64) (3!:4) (-~2)&+ ,y else. a: end. return.
+end.
+if. x=2 do.
+  if. t e. 1 4 8 do. 2 (3!:5) (-~1.5)&+ ,y else. a: end. return.
+end.
+if. x=3 do.
+  if. x0 -.@e. SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP do.
+    if. 32=t do.
+      if. 0 e. 2 = 3!:0 &> y do. a: return. end.
+      ; (,&({.a.))@dtb&.> y return.
+    elseif. 2=t do.
+      ; (,&({.a.))@dtb&.> <"1 y return.
+    elseif. do.
+      a: return.
+    end.
+  else.
+    if. UseDayNo do.
+      if. 1 4 8 -.@e.~ 3!:0 da=. y do.
+        a: return.
+      end.
+      nul=. DateTimeNull= da=. ,da
+      da=. isotimestamp 1 tsrep <.86400000* 0 (I.nul)}da
+      if. SQL_TYPE_TIMESTAMP= t do. da=. 23{."1 da
+      elseif. SQL_TYPE_DATE= t do. da=. 10{."1 da
+      elseif. SQL_TYPE_TIME= t do. da=. 11}."1 da
+      end.
+    else.
+      if. 2 131072 262144 -.@e.~ 3!:0 da=. y do.
+        a: return.
+      end.
+      if. 2>#@$ da do. da=. ,: ,da end.
+      nul=. (*./"1 e.&' '"1 da) +. (+./"1 '1800-01-01'&E."1 da) +. (+./"1 'NULL'&E."1 da)
+      if. SQL_TYPE_TIMESTAMP= t do. da=. 23{."1 da
+      elseif. SQL_TYPE_DATE= t do. da=. 10{."1 da
+      elseif. SQL_TYPE_TIME= t do. da
+      end.
+    end.
+    if. #nul do.
+      if. (#SQLITE_NULL_TEXT)>{:@$da do.
+        da=. (#SQLITE_NULL_TEXT){."1 da
+      end.
+      da=. (({:@$da){.SQLITE_NULL_TEXT) (I. nul)} da
+    end.
+    ; (,&({.a.))@dtb&.> <"1 da return.
+  end.
+end.
+if. x=4 do.
+  if. 32=t do.
+    if. 0 e. 2 = 3!:0 &> y do. a: return. end.
+    (2 (3!:4) # &> y),;y
+  elseif. 2=t do.
+    if. 2>$$y do. n1=. 1 else. n1=. {.@$ y end.
+    (2 (3!:4) n1#{:@$y), ,y
+  elseif. do.
+    a:
+  end.
+  return.
+end.
+a:
+)
+gettyp=: 3 : 0
+select. y
+case. SQL_INTEGER do. 1
+case. SQL_DOUBLE do. 2
+case. SQL_CHAR;SQL_WCHAR;SQL_VARCHAR;SQL_WVARCHAR;SQL_LONGVARCHAR;SQL_WLONGVARCHAR do. 3
+case. SQL_LONGVARBINARY do. 4
+case. SQL_TYPE_DATE;SQL_TYPE_TIME;SQL_TYPE_TIMESTAMP do. 3
+case. do. _1
+end.
+)
 datnull=: 3 : 0"1
 if. SQLITE_TEXT= t=. sqlite3_column_type (b0 y) do. SQL_VARCHAR ,&< datchar y
 elseif. SQLITE_BLOB= t do. SQL_LONGVARBINARY ,&< datblob y
@@ -1426,12 +1558,12 @@ if. has_sqlite3_extversion *. (_1=r) do.
     end.
     if. UseUnicode do.
       for_i. I.(SQL_CHAR,SQL_WCHAR,SQL_WVARCHAR,SQL_WLONGVARCHAR) e.~ ty do.
-        data=. (< ucp&.> i{::data) i}data
+        data=. (< (ucp ::])&.> i{::data) i}data
       end.
     end.
     if. UseDayNo do.
       for_i. I.(SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP) e.~ ty do.
-        data=. (< ,. numdate`numtime`numdatetime@.((SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP)i.i{ty)&.> i{::data) i}data
+        data=. (< ,@(numdate`numtime`numdatetime@.((SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP)i.i{ty))&.> i{::data) i}data
       end.
     end.
   end.
@@ -1455,7 +1587,7 @@ for_i. i.#ty do.
   elseif. (SQL_CHAR,SQL_WCHAR,SQL_VARCHAR,SQL_WVARCHAR) e.~ i{ty do.
     (pref,":i)=. 0$''
   elseif. (SQL_LONGVARCHAR,SQL_WLONGVARCHAR) e.~ i{ty do.
-    (pref,":i)=. 0$<''
+    (pref,":i)=. 0$''
   elseif. SQL_LONGVARBINARY = i{ty do.
     (pref,":i)=. 0$<''
   elseif. (SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP) e.~ i{ty do.
@@ -1481,21 +1613,21 @@ while.do.
     4!:55 <(pref,":i)
     if. SQLITE_NULL= sqlite3_column_type (b0 i{cc) do.
       if. SQL_INTEGER = i{ty do.
-        tmp=. tmp, NumericNull
+        tmp=. tmp, IntegerNull
       elseif. SQL_DOUBLE = i{ty do.
         tmp=. tmp, NumericNull
       elseif. (SQL_CHAR,SQL_WCHAR,SQL_VARCHAR,SQL_WVARCHAR) e.~ i{ty do.
-        tmp=. tmp, {.a.
+        tmp=. tmp, SQLITE_NULL_TEXT,{.a.
       elseif. (SQL_LONGVARCHAR,SQL_WLONGVARCHAR) e.~ i{ty do.
-        tmp=. tmp, <{.a.
+        tmp=. tmp, SQLITE_NULL_TEXT,{.a.
       elseif. SQL_LONGVARBINARY = i{ty do.
-        tmp=. tmp, <''
+        tmp=. tmp, <SQLITE_NULL_TEXT
       elseif. SQL_TYPE_DATE = i{ty do.
-        tmp=. tmp, {.a.
+        tmp=. tmp, SQLITE_NULL_TEXT,{.a.
       elseif. SQL_TYPE_TIME = i{ty do.
-        tmp=. tmp, {.a.
+        tmp=. tmp, SQLITE_NULL_TEXT,{.a.
       elseif. SQL_TYPE_TIMESTAMP = i{ty do.
-        tmp=. tmp, {.a.
+        tmp=. tmp, SQLITE_NULL_TEXT,{.a.
       elseif. do.
         tmp=. tmp, {.a.
       end.
@@ -1507,7 +1639,7 @@ while.do.
       elseif. (SQL_CHAR,SQL_WCHAR,SQL_VARCHAR,SQL_WVARCHAR) e.~ i{ty do.
         tmp=. tmp, datchar i{cc
       elseif. (SQL_LONGVARCHAR,SQL_WLONGVARCHAR) e.~ i{ty do.
-        tmp=. tmp, (<@:(ucp^:UseUnicode)@:}:@:datchar)`((<'')"_)@.ignorelongdata i{cc
+        tmp=. tmp, datchar`(({.a.)"_)@.ignorelongdata i{cc
       elseif. SQL_LONGVARBINARY = i{ty do.
         tmp=. tmp, datblob`((<'')"_)@.ignorelongdata i{cc
       elseif. SQL_TYPE_DATE = i{ty do.
@@ -1565,12 +1697,12 @@ else.
     elseif. (SQL_CHAR,SQL_WCHAR,SQL_VARCHAR,SQL_WVARCHAR) e.~ i{ty do.
       dat=. dat, < <;._2 ucp^:UseUnicode (pref,":i)~
     elseif. (SQL_LONGVARCHAR,SQL_WLONGVARCHAR) e.~ i{ty do.
-      dat=. dat, < (pref,":i)~
+      dat=. dat, < <;._2 ucp^:UseUnicode (pref,":i)~
     elseif. SQL_LONGVARBINARY = i{ty do.
       dat=. dat, < (pref,":i)~
     elseif. (SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP) e.~ i{ty do.
       if. UseDayNo do.
-        dat=. dat, < numdate`numtime`numdatetime@.((SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP)i.i{ty);._2 (pref,":i)~
+        dat=. dat, < ,@(numdate`numtime`numdatetime@.((SQL_TYPE_DATE,SQL_TYPE_TIME,SQL_TYPE_TIMESTAMP)i.i{ty));._2 (pref,":i)~
       else.
         dat=. dat, < <;._2 (pref,":i)~
       end.
@@ -1589,7 +1721,9 @@ end.
 numdate=: 3 : 0
 if. 0= #y=. dltb y do.
   DateTimeNull
-else.
+elseif. SQLITE_NULL_TEXT-:y do.
+  DateTimeNull
+elseif. do.
   86400000%~ tsrep 0 0 0,~ 3{. ". ' 0123456789' ([-.-.)~ ' ' (I. y e. '-:+TZ')}y
 end.
 )
@@ -1597,7 +1731,9 @@ end.
 numtime=: 3 : 0"1
 if. 0= #y=. dltb y do.
   DateTimeNull
-else.
+elseif. SQLITE_NULL_TEXT-:y do.
+  DateTimeNull
+elseif. do.
   86400000%~ tsrep 0 (0 1 2)} 6{. ". ' 0123456789' ([-.-.)~ ' ' (I. y e. '-:+TZ')}y
 end.
 )
@@ -1605,13 +1741,15 @@ end.
 numdatetime=: 3 : 0"1
 if. 0= #y=. dltb y do.
   DateTimeNull
-else.
+elseif. SQLITE_NULL_TEXT-:y do.
+  DateTimeNull
+elseif. do.
   86400000%~ tsrep 6{. ". ' 0123456789' ([-.-.)~ ' ' (I. y e. '-:+TZ')}y
 end.
 )
 sqlread0=: 3 : 0
 sh=. y
-'rc j res'=. sqlite3_read_values sh;,2
+'rc j res'=. sqlite3_read_values0 sh;,2
 assert. rc = SQLITE_DONE
 SZI=. IF64{4 8
 'buf typ nms len rws cls'=. memr res, 0 6 4
@@ -1654,10 +1792,16 @@ if. -.iscl y do. _2 return. end.
 dbq=. utf8 ,>y
 if. fexist dbq do. _1 return. end.
 handle=. ,_1
-if. SQLITE_OK~: rc=. >@{. cdrc=. sqlite3_open_v2 (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_CREATE);<<0 do.
+if. has_sqlite3_extversion do.
+  nul=. SQLITE_NULL_INTEGER;SQLITE_NULL_FLOAT;SQLITE_NULL_TEXT
+  cdrc=. sqlite3_extopen (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_CREATE);nul,<<0
+else.
+  cdrc=. sqlite3_open_v2 (iospath^:IFIOS dbq);handle;(SQLITE_OPEN_READWRITE+SQLITE_OPEN_CREATE);<<0
+end.
+if. SQLITE_OK~: rc=. >@{. cdrc do.
   rc
 else.
-  0 [ sqlite3_close {.handle=. 2{::cdrc
+  0 [ sqlite3_close {. 2{::cdrc
 end.
 )
 exec=: 4 : 0
@@ -1673,6 +1817,7 @@ end.
 rc
 )
 getDateTimeNull=: 3 : 'DateTimeNull'
+getIntegerNull=: 3 : 'IntegerNull'
 getNumericNull=: 3 : 'NumericNull'
 getUseErrRet=: 3 : 'UseErrRet'
 getUseDayNo=: 3 : 'UseDayNo'
