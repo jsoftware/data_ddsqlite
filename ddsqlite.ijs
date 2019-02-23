@@ -1724,7 +1724,7 @@ if. 0= #y=. dltb y do.
 elseif. SQLITE_NULL_TEXT-:y do.
   DateTimeNull
 elseif. do.
-  86400000%~ tsrep 0 0 0,~ 3{. ". ' 0123456789' ([-.-.)~ ' ' (I. y e. '-:+TZ')}y
+  86400000%~ tsrep 0 0 0,~ 3{. ". ' 0123456789.' ([-.-.)~ ' ' (I. y e. '-:+TZ')}y
 end.
 )
 
@@ -1734,7 +1734,7 @@ if. 0= #y=. dltb y do.
 elseif. SQLITE_NULL_TEXT-:y do.
   DateTimeNull
 elseif. do.
-  86400000%~ tsrep 0 (0 1 2)} 6{. ". ' 0123456789' ([-.-.)~ ' ' (I. y e. '-:+TZ')}y
+  86400000%~ tsrep 0 (0 1 2)} 6{. ". ' 0123456789.' ([-.-.)~ ' ' (I. y e. '-:+TZ')}y
 end.
 )
 
@@ -1744,7 +1744,7 @@ if. 0= #y=. dltb y do.
 elseif. SQLITE_NULL_TEXT-:y do.
   DateTimeNull
 elseif. do.
-  86400000%~ tsrep 6{. ". ' 0123456789' ([-.-.)~ ' ' (I. y e. '-:+TZ')}y
+  86400000%~ tsrep 6{. ". ' 0123456789.' ([-.-.)~ ' ' (I. y e. '-:+TZ')}y
 end.
 )
 sqlread0=: 3 : 0
