@@ -60,6 +60,11 @@ fnd=. 0
 if. -. (USEJSQLITE"_)^:(0=4!:0<'USEJSQLITE') 0 do.
 elseif. UNAME-:'Android' do.
   arch=. LF-.~ 2!:0'getprop ro.product.cpu.abi'
+  if. IF64 < arch-:'arm64-v8a' do.
+    arch=. 'armeabi-v7a'
+  elseif. IF64 < arch-:'x86_64' do.
+    arch=. 'x86'
+  end.
   t=. (jpath'~bin/../libexec/android-libs/',arch,'/libjsqlite3.so')
   fnd=. 0-.@-:(t, ' sqlite3_extversion > ',(IFWIN#'+'),' x')&cd ::0: ''
 elseif. do.
